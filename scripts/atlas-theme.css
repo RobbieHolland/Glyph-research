@@ -173,3 +173,12 @@ button,input,summary{font-size:14px}
  .parent-controls.guided-view #app.has-selection{grid-template-columns:1fr;grid-template-rows:1fr}
  .parent-controls.guided-view #side{display:none}
 }
+
+/* Embedded legend sits above the map; footer-triggered menus open upward. */
+.parent-controls .legend{top:14px;bottom:auto;left:20px}
+.parent-controls #toolbar{top:auto;bottom:12px;left:12px;right:auto}
+.parent-controls #toolbar #outcomePicker>.outcomes{top:auto;bottom:0;max-height:min(410px,calc(100vh - 24px))}
+
+/* Reserve a little space above the embedded map for its legend. */
+.parent-controls .legend{top:4px}
+.parent-controls #graph{padding-top:38px}

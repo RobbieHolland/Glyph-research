@@ -137,6 +137,8 @@ const NS='http://www.w3.org/2000/svg',S=1000,BASE_NODE_OPACITY=1;'''
 
     template=template.replace("n.interpretation||'No interpretation available.'", "n.interpretation||''")
     template=template.replace("function showTip(e,n){tip.textContent=n.interpretation||'No interpretation available';moveTip(e)}", "function showTip(e,n){tip.textContent=n.interpretation||'';if(!tip.textContent){tip.style.opacity=0;return}moveTip(e)}")
+    template=template.replace("if(DATA.guided_mode&&!e.ctrlKey&&!e.metaKey){e.preventDefault();tip.style.opacity=0;","if((DATA.guided_mode||DATA.story_wheel_locked)&&!e.ctrlKey&&!e.metaKey){e.preventDefault();tip.style.opacity=0;")
+    template=template.replace('<div class="meta">Unadjusted odds ratios · solid: significant · pale: nonsignificant. Spokes show higher odds, using the paper’s square-root scale. Hover for values. Only higher-risk estimates (OR > 1) are shown.</div>','')
     template=template.replace('selected.clear();selected.add(DATA.initial_outcome);','selected.clear();')
     template=template.replace('${DATA.nodes.length.toLocaleString()} concepts · ${hits.toLocaleString()}', '${DATA.nodes.length.toLocaleString()} nodes · ${hits.toLocaleString()}')
     template=template.replace("if(isSimple)return;activeRankSort=sortOutcome;", "if(isSimple)return;activeRankSort=sortOutcome;")

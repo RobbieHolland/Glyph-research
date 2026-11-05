@@ -1,6 +1,7 @@
 // Research-site adapter around Glyph's reusable standalone explorer.
 // Coordinates and edges are immutable exports; all interactions are display-only.
 let sidebarOpened=false;
+DATA.story_wheel_locked=!!DATA.progressive_associations;
 document.body.classList.toggle('standalone-atlas',window.parent===window);
 const outcomeFamily=new Map();Object.entries(DATA.outcome_groups).forEach(([g,names])=>names.forEach(n=>outcomeFamily.set(n,g)));
 const familyColor=g=>{const name=DATA.outcome_groups[g]?.[0];return name?outcomeColor(name):'#8a8a85'};
@@ -133,7 +134,7 @@ function compactOutcomeAssociations(){
  const detail=document.getElementById('detail'),table=detail.querySelector('table.assoc');if(!table)return;
  const allowed=new Set((A[selectedNode.i]||[]).filter(a=>a.odds_ratio>1).map(a=>a.outcome));
  [...table.querySelectorAll('tbody tr')].forEach(row=>{if(!allowed.has(row.querySelector('[data-outcome]')?.dataset.outcome))row.remove()});
- const noteText='Higher-risk associations (OR > 1), ordered by OR. P-values are Bonferroni-adjusted; intervals are 95% CIs. Click an outcome to highlight it.';
+ const noteText='Top outcomes by odds ratio, with Bonferroni-adjusted p-values.';
  if(table.previousElementSibling?.classList.contains('assoc-note'))table.previousElementSibling.textContent=noteText;
  const rows=[...table.querySelectorAll('tbody tr')];if(rows.length<=3)return;
  const body=table.querySelector('tbody');body.id='outcome-association-rows';
@@ -143,13 +144,19 @@ function compactOutcomeAssociations(){
   rows.forEach((row,index)=>row.hidden=!associationListExpanded&&index>=3);
   button.textContent=associationListExpanded?'Show less':`Show more (${rows.length-3})`;
   button.setAttribute('aria-expanded',String(associationListExpanded));
-  if(note?.classList.contains('assoc-note'))note.textContent=`${associationListExpanded?'All higher-risk outcomes':'Top three higher-risk outcomes'} by OR. P-values are Bonferroni-adjusted; intervals are 95% CIs. Click an outcome to highlight it.`;
+  if(note?.classList.contains('assoc-note'))note.textContent=noteText;
  }
  button.onclick=()=>{associationListExpanded=!associationListExpanded;update()};
  table.after(button);update();
 }
+function simplifyConceptSummary(){
+ const detail=document.getElementById('detail');
+ detail.querySelector('.concept-modality')?.remove();
+ const count=detail.querySelector('.wheel-count'),windowNote=detail.querySelector('.wheel-window');
+ if(count&&windowNote){windowNote.textContent=`First recorded onset 1–4 years after the CT scan. ${count.textContent.trim()}.`;count.remove()}
+}
 const sourceRenderSelected=renderSelected;
-renderSelected=function(){sourceRenderSelected();compactOutcomeAssociations();updateConceptMarker(selectedNode);sidebarOpened=sidebarOpened||!!selectedNode;document.getElementById('app').classList.toggle('has-selection',sidebarOpened);const exportButton=document.getElementById('exportConcept');if(exportButton)exportButton.disabled=!!(DATA.progressive_associations&&!selectedNode?.associations_ready)};
+renderSelected=function(){sourceRenderSelected();simplifyConceptSummary();compactOutcomeAssociations();updateConceptMarker(selectedNode);sidebarOpened=sidebarOpened||!!selectedNode;document.getElementById('app').classList.toggle('has-selection',sidebarOpened);const exportButton=document.getElementById('exportConcept');if(exportButton)exportButton.disabled=!!(DATA.progressive_associations&&!selectedNode?.associations_ready)};
 let cameraTravelFrame=null,scrollCameraFrame=null,scrollCameraTarget=null,scrollCameraLastTime=0;
 function cancelGuidedCamera(){if(cameraTravelFrame!==null)cancelAnimationFrame(cameraTravelFrame);if(scrollCameraFrame!==null)cancelAnimationFrame(scrollCameraFrame);cameraTravelFrame=null;scrollCameraFrame=null;scrollCameraTarget=null}
 function travelCamera(target,duration=1050){
@@ -274,16 +281,40 @@ window.addEventListener('message',event=>{
  }
 });
 let applyingGuidedScene=false;
-function setGuidedMode(enabled){DATA.guided_mode=enabled;if(!enabled)releaseGuidedPanel();if(!enabled&&DATA.story_related?.length){DATA.story_related=[];applyFilters()}document.body.classList.toggle('guided-view',enabled);svg.style.touchAction=enabled?'pan-y':'none'}
+function setGuidedMode(enabled){DATA.guided_mode=enabled;if(!enabled)releaseGuidedPanel();if(!enabled&&DATA.story_related?.length){DATA.story_related=[];applyFilters()}document.body.classList.toggle('guided-view',enabled);svg.style.touchAction=(enabled||DATA.story_wheel_locked)?'pan-y':'none'}
 function beginManualExploration(){cancelGuidedCamera();if(DATA.guided_mode&&!applyingGuidedScene){setGuidedMode(false);notifyParent('glyph:manual')}}
-document.addEventListener('pointerdown',event=>{if(event.pointerType!=='touch'&&event.target.closest('button,input,summary,.hit')&&!event.target.closest('#association-more'))beginManualExploration()},true);
-document.addEventListener('click',event=>{if(event.target.closest('button,input,summary,.hit')&&!event.target.closest('#association-more'))beginManualExploration()},true);
+document.addEventListener('pointerdown',event=>{if(event.pointerType!=='touch'&&event.target.closest('button,input,summary,.hit,#graph')&&!event.target.closest('#association-more'))beginManualExploration()},true);
+document.addEventListener('click',event=>{if(event.target.closest('button,input,summary,.hit,#graph')&&!event.target.closest('#association-more'))beginManualExploration()},true);
 document.getElementById('search').addEventListener('input',beginManualExploration);
 // Reading a scrolling details panel takes manual control without moving the page.
-document.getElementById('side').addEventListener('wheel',beginManualExploration,{capture:true,passive:true});
+document.getElementById('side').addEventListener('wheel',event=>{
+ beginManualExploration();
+ if(!DATA.story_wheel_locked||!event.deltaY)return;
+ const side=event.currentTarget;
+ for(let el=event.target;el&&side.contains(el);el=el.parentElement){
+  if(!/(auto|scroll)/.test(getComputedStyle(el).overflowY)||el.scrollHeight<=el.clientHeight+1)continue;
+  if(event.deltaY<0?el.scrollTop>1:el.scrollTop+el.clientHeight<el.scrollHeight-1)return;
+ }
+ // Resume the page story once scrolling reaches the boundary of the details.
+ event.preventDefault();notifyParent('glyph:scroll',{deltaY:event.deltaY,deltaMode:event.deltaMode});
+},{capture:true,passive:false});
+// Keep scrolling attached to the unfinished story across the whole map,
+// including empty space, the legend and zoom controls after details close.
+document.addEventListener('wheel',event=>{
+ if(!DATA.story_wheel_locked||!event.deltaY||event.target.closest('#side,#toolbar,dialog,input,textarea,select'))return;
+ event.preventDefault();event.stopImmediatePropagation();
+ notifyParent('glyph:scroll',{deltaY:event.deltaY,deltaMode:event.deltaMode});
+},{capture:true,passive:false});
+document.addEventListener('keydown',event=>{
+ if(!DATA.story_wheel_locked||event.target.closest('input,textarea,select,[contenteditable=true],dialog'))return;
+ const distance={ArrowUp:-40,ArrowDown:40,PageUp:-innerHeight*.85,PageDown:innerHeight*.85,' ':innerHeight*.85};
+ if(!(event.key in distance))return;
+ event.preventDefault();notifyParent('glyph:scroll',{deltaY:distance[event.key]*(event.key===' '&&event.shiftKey?-1:1),deltaMode:0});
+});
+svg.addEventListener('touchmove',()=>{if(DATA.story_wheel_locked&&!DATA.guided_mode)notifyParent('glyph:resume-story')},{passive:true});
 window.addEventListener('message',event=>{
  if(event.source!==window.parent)return;const m=event.data;
- if(m?.type==='glyph:guided-mode'){setGuidedMode(!!m.enabled);if(!m.enabled)cancelGuidedCamera()}
+ if(m?.type==='glyph:guided-mode'){if(typeof m.storyScroll==='boolean')DATA.story_wheel_locked=m.storyScroll;setGuidedMode(!!m.enabled);if(!m.enabled)cancelGuidedCamera()}
  if(m?.type==='glyph:select-outcome'){
   setGuidedMode(false);const outcome=DATA.outcomes.find(o=>o===m.outcome||o.endsWith('('+m.outcome+')'));
   if(outcome){selected.clear();selected.add(outcome);colorMode='outcome';document.querySelector('input[name="colorMode"][value="outcome"]').checked=true;syncOutcomeBoxes();clearSelection();travelCamera({scale:1,tx:0,ty:0});notifyParent()}

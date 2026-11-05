@@ -2,11 +2,12 @@ const frame=document.getElementById('concept-atlas'),loading=document.getElement
 const modeButtons=[...document.querySelectorAll('[data-mode]')],guideToggle=document.getElementById('guide-toggle'),manualTools=document.getElementById('explore-tools');
 const initialConcept=new URLSearchParams(location.search).get('concept');
 let associationsReady=false,atlasReady=false,activeStory=0,lastAppliedStory=-1,guidedEnabled=!initialConcept,pendingOutcomeShortcut=null,overviewSettled=false,heldGraphScroll=null,gateAdjusting=false,storyCompleted=false;
+let storyWheelLocked=!initialConcept;
 const storySteps=[...document.querySelectorAll('.story-step')];
 // Phones use one caption below the network; original steps remain scroll triggers.
 const phoneStory=matchMedia('(max-width: 850px)'),mobileCaption=document.createElement('section');
 mobileCaption.id='mobile-story-caption';mobileCaption.className='mobile-story-caption story-step-copy';mobileCaption.setAttribute('aria-label','Current story');
-frame.after(mobileCaption);
+(document.querySelector('.network-controls')||frame).after(mobileCaption);
 function syncMobileCaption(){
  mobileCaption.setAttribute('aria-hidden',String(!phoneStory.matches));
  if(!phoneStory.matches)return;
@@ -17,11 +18,17 @@ phoneStory.addEventListener('change',syncMobileCaption);
 
 function send(message){frame.contentWindow?.postMessage(message,'*')}
 function syncMode(mode){modeButtons.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.mode===mode)))}
+function resumeStoryScroll(){
+ if(!storyWheelLocked||storyCompleted||guidedEnabled)return;
+ const url=new URL(location.href);url.searchParams.delete('concept');history.replaceState(null,'',url);
+ setGuided(true);
+}
 function setGuided(enabled,revealTools=false){
+ if(enabled)storyWheelLocked=true;else if(storyCompleted)storyWheelLocked=false;
  const replay=enabled&&storyCompleted;
  if(replay){storyCompleted=false;delete storyShell.dataset.completed;activeStory=0;lastAppliedStory=-1;markStory(0)}
  guidedEnabled=enabled;if(!enabled)heldGraphScroll=null;guideToggle.textContent=enabled?'Explore freely':storyCompleted?'Replay story':'Resume scroll guide';guideToggle.setAttribute('aria-pressed',String(!enabled));
- document.getElementById('atlas').dataset.manual=String(!enabled);send({type:'glyph:guided-mode',enabled});
+ document.getElementById('atlas').dataset.manual=String(!enabled);send({type:'glyph:guided-mode',enabled,storyScroll:storyWheelLocked});
  if(!enabled&&revealTools)manualTools.open=true;
  if(enabled){manualTools.open=false;lastAppliedStory=-1;applyStory()}
  if(replay)window.scrollTo({top:scrollY+storyShell.getBoundingClientRect().top-94,behavior:'instant'});
@@ -86,13 +93,18 @@ addEventListener('wheel',event=>{
  const unit=event.deltaMode===1?16:event.deltaMode===2?innerHeight:1;
  const delta=event.deltaY*unit;
  if(event.target.closest?.('dialog,input,textarea,select,.manual-options,#atlas-search-results'))return;
+ resumeStoryScroll();
  if(needsGraphHold((heldGraphScroll??scrollY)+delta)){
   // Nested controls and dialogs retain their native scrolling.
   if(event.target.closest?.('dialog,input,textarea,select,.manual-options,#atlas-search-results'))return;
   event.preventDefault();scrollWithGraphGate(delta);
  }
 },{passive:false});
-addEventListener('keydown',event=>{if(['ArrowUp','PageUp','Home'].includes(event.key))heldGraphScroll=null});
+addEventListener('touchmove',event=>{if(!event.target.closest?.('dialog,input,textarea,select,.manual-options,#mobile-story-caption'))resumeStoryScroll()},{passive:true});
+addEventListener('keydown',event=>{
+ if(['ArrowUp','PageUp','Home'].includes(event.key))heldGraphScroll=null;
+ if(['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(event.key)&&!event.target.closest?.('input,textarea,select,[contenteditable=true],dialog'))resumeStoryScroll();
+});
 // Also cover keyboard, touch momentum and scrollbar overshoots.
 let lastPageScrollY=scrollY;
 addEventListener('scroll',()=>{
@@ -165,10 +177,11 @@ guideToggle.addEventListener('click',()=>setGuided(!guidedEnabled));
 modeButtons.forEach(button=>button.addEventListener('click',()=>{setGuided(false);syncMode(button.dataset.mode);send({type:'glyph:color',mode:button.dataset.mode});manualTools.open=false}));
 document.getElementById('choose-diseases').addEventListener('click',()=>{setGuided(false);syncMode('outcome');send({type:'glyph:outcomes'})});
 document.getElementById('toggle-regions').addEventListener('click',event=>{const visible=event.currentTarget.getAttribute('aria-pressed')!=='true';event.currentTarget.setAttribute('aria-pressed',String(visible));send({type:'glyph:regions',visible});manualTools.open=false});
-frame.addEventListener('load',()=>{loading.hidden=true;atlasReady=true;send({type:'glyph:guided-mode',enabled:guidedEnabled});if(initialConcept)send({type:'glyph:concept',concept:initialConcept});applyStory()});
+frame.addEventListener('load',()=>{loading.hidden=true;atlasReady=true;send({type:'glyph:guided-mode',enabled:guidedEnabled,storyScroll:storyWheelLocked});if(initialConcept)send({type:'glyph:concept',concept:initialConcept});applyStory()});
 window.addEventListener('message',event=>{
  if(event.source!==frame.contentWindow)return;const message=event.data;if(!message||typeof message!=='object')return;
- if(message.type==='glyph:scroll'&&guidedEnabled){const unit=message.deltaMode===1?16:message.deltaMode===2?innerHeight:1;scrollWithGraphGate(message.deltaY*unit);return}
+ if(message.type==='glyph:scroll'&&(guidedEnabled||storyWheelLocked)){resumeStoryScroll();const unit=message.deltaMode===1?16:message.deltaMode===2?innerHeight:1;scrollWithGraphGate(message.deltaY*unit);return}
+ if(message.type==='glyph:resume-story'){resumeStoryScroll();return}
  if(message.type==='glyph:manual'){setGuided(false);return}
  if(message.type==='glyph:camera-state'){
   overviewSettled=!!message.overviewSettled;
@@ -180,7 +193,7 @@ window.addEventListener('message',event=>{
   if(associationsReady){applyOutcomeShortcut();applyStory()}
  }
  if(message.type==='glyph:ready'){
-  atlasReady=true;loading.hidden=true;send({type:'glyph:guided-mode',enabled:guidedEnabled});if(initialConcept)send({type:'glyph:concept',concept:initialConcept});applyOutcomeShortcut();applyStory();
+  atlasReady=true;loading.hidden=true;send({type:'glyph:guided-mode',enabled:guidedEnabled,storyScroll:storyWheelLocked});if(initialConcept)send({type:'glyph:concept',concept:initialConcept});applyOutcomeShortcut();applyStory();
  }
  if(message.type==='glyph:regions-state')document.getElementById('toggle-regions').setAttribute('aria-pressed',String(message.regionsVisible));
  if(Number.isInteger(message.selectedOutcomes))document.querySelector('.count-chip').textContent=message.selectedOutcomes+'/141';

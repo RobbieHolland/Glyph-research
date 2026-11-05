@@ -1,0 +1,101 @@
+{
+  "metric": "Mean per-study reconstruction R²",
+  "definition": "Compute R² for each study and average within each modality and cohort; this is not a pooled R².",
+  "configuration": {
+    "dictionary_size": 8192,
+    "active_features_per_study": 40,
+    "matryoshka_levels": [
+      128,
+      512,
+      2048,
+      8192
+    ]
+  },
+  "normalization_and_training": "Discovery training data",
+  "source": "Cached per-study reconstruction analysis for the paper SAE configuration",
+  "source_sweep": "a1vxc5dx",
+  "source_script_sha256": "f29261de0e1c95e17c14c19083d05cf3483f8e400d92bf7698b8cd8e0e4e6aae",
+  "cohorts": {
+    "train": "Discovery train",
+    "test": "Internal Test",
+    "tri_valley": "External Site #1",
+    "mayo": "External Site #2"
+  },
+  "results": [
+    {
+      "modality": "image",
+      "label": "CT imaging (Merlin)",
+      "cohorts": {
+        "train": {
+          "mean_r_squared": 0.9605674744,
+          "median_r_squared": 0.9608882666,
+          "studies": 15331
+        },
+        "test": {
+          "mean_r_squared": 0.9494748116,
+          "median_r_squared": 0.9510284066,
+          "studies": 5137
+        },
+        "tri_valley": {
+          "mean_r_squared": 0.9187365174,
+          "median_r_squared": 0.9268302321,
+          "studies": 25803
+        },
+        "mayo": {
+          "mean_r_squared": 0.9230237007,
+          "median_r_squared": 0.9271829128,
+          "studies": 14199
+        }
+      }
+    },
+    {
+      "modality": "findings",
+      "label": "Radiology reports (Qwen3)",
+      "cohorts": {
+        "train": {
+          "mean_r_squared": 0.8695002198,
+          "median_r_squared": 0.8681609631,
+          "studies": 15331
+        },
+        "test": {
+          "mean_r_squared": 0.8046287298,
+          "median_r_squared": 0.8054129481,
+          "studies": 5137
+        },
+        "tri_valley": {
+          "mean_r_squared": 0.7590094209,
+          "median_r_squared": 0.7698003054,
+          "studies": 25803
+        },
+        "mayo": {
+          "mean_r_squared": 0.646599412,
+          "median_r_squared": 0.6522310376,
+          "studies": 14199
+        }
+      }
+    },
+    {
+      "modality": "labs",
+      "label": "Laboratory measurements",
+      "cohorts": {
+        "train": {
+          "mean_r_squared": 0.9813700318,
+          "median_r_squared": 0.9834755063,
+          "studies": 14919
+        },
+        "test": {
+          "mean_r_squared": 0.9791179895,
+          "median_r_squared": 0.9819306135,
+          "studies": 5011
+        },
+        "tri_valley": {
+          "mean_r_squared": 0.9567078352,
+          "median_r_squared": 0.9633693099,
+          "studies": 24710
+        },
+        "mayo": null
+      }
+    }
+  ],
+  "omissions": "External Site #2 laboratory results are not reported; no study-level identifiers or values are included."
+}

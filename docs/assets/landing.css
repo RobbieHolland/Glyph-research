@@ -241,9 +241,38 @@ body{background:#fff;color:#171717}
 
 /* More scroll distance at each desktop focus, with a slower passage through the middle. */
 @media(min-width:851px){
- .story-step:not(:last-child){min-height:172svh}
+ .story-step:not(:last-child){min-height:150svh}
  .story-step .story-step-copy{transform:none;translate:0 var(--story-focus-offset,0px);transition:none}
 }
 
 /* Color the disease name, keeping the risk-marker wording neutral. */
 .story-step .story-accent-heading,.mobile-story-caption .story-accent-heading{color:#252525}
+
+/* Recognizable, full-color resource marks on the pale link buttons. */
+.resource-button[href*="pypi.org"] img{width:22px;height:20px;filter:none;opacity:1}
+
+.resource-button[href*="huggingface.co"] img{width:22px;height:22px;filter:none;opacity:1}
+
+.hero .scroll-cue{display:inline-flex;align-items:center;gap:10px;min-height:44px;font-size:20px;font-weight:500;line-height:1.4;color:#525252}
+.hero .scroll-cue span{font-size:24px}
+@media(max-width:580px){.hero .scroll-cue{font-size:18px}.hero .scroll-cue span{font-size:22px}}
+
+.atlas-section .dataset-strip{font-size:14px;gap:14px 20px;color:#606060}
+.dataset-strip .dataset-origin{font-size:16px;font-weight:500;color:#292929;white-space:nowrap}
+@media(max-width:580px){
+ .atlas-section .dataset-strip{font-size:13px;gap:10px 13px}
+ .dataset-strip .dataset-origin{font-size:15px}
+}
+
+/* Keep exploration controls together beneath the network. */
+.network-controls{padding-top:8px;border-top:1px solid #ededed}
+.network-controls>.outcome-shortcuts{justify-content:flex-start;margin:4px 0 10px;gap:8px}
+.network-controls>.outcome-shortcuts button{font-size:14px;min-height:40px;padding:10px 14px}
+.network-controls .atlas-controls{padding:0;min-height:40px}
+.network-controls #atlas-search-results{top:auto;bottom:calc(100% + 6px)}
+.network-controls .manual-options{top:auto;bottom:calc(100% + 8px)}
+@media(max-width:850px){
+ .network-controls>.outcome-shortcuts{margin-bottom:8px;gap:7px}
+ .network-controls>.outcome-shortcuts button{font-size:12px;min-height:36px;padding:8px 11px}
+ .network-controls .atlas-controls{min-height:32px}
+}

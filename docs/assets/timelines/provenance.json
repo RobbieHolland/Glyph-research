@@ -1,5 +1,5 @@
 {
-  "method": "Frozen paper SVGs; plotted estimates and annotation placement unchanged. Page headings replace figure titles. Hover metadata is restricted to aggregate estimates and bibliographic fields.",
+  "method": "Frozen paper SVGs; plotted estimates and marker positions unchanged. Page headings replace figure titles; axis wording is simplified, with the original age/sex/recorded-race adjustment, SD units and study count noted below. Hover metadata is restricted to aggregate estimates and bibliographic fields.",
   "source_sha256": {
     "hfpef": {
       "timeline.svg": "9ce356dffa9f8e2c0d149722465f2413c8e1ac7fb5ccd1ceb6133332e6a1afbc",

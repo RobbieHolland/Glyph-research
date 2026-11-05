@@ -1,6 +1,6 @@
 .timelines-section{padding-top:75px;padding-bottom:68px}
 .timelines-section>h2{font-size:30px;letter-spacing:-1px;font-weight:550;margin:0 0 12px}
-.timeline-intro{font-size:13px;color:#737373;margin:0 0 38px;max-width:700px}
+.timeline-intro{font-size:17px;line-height:1.6;color:#525252;margin:0 0 30px;max-width:800px}
 .timeline-example{padding:26px 0 35px;border-top:1px solid #ededed}
 .timeline-example+.timeline-example{margin-top:20px}
 .timeline-example-heading{display:flex;align-items:baseline;justify-content:space-between;gap:18px;margin-bottom:20px}
@@ -48,3 +48,5 @@
 .timeline-marker-scope{display:block;font-size:16px;font-weight:450;letter-spacing:0;line-height:1.45;color:#525252;margin-bottom:7px}
 .timeline-outcome{display:block}
 @media(max-width:580px){.timeline-example-heading h3{font-size:22px}.timeline-marker-scope{font-size:14px}}
+
+.timeline-adjustment-note{font-size:14px;line-height:1.6;color:#606060;margin:12px 0 0;max-width:1050px}

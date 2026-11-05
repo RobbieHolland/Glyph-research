@@ -1,0 +1,45 @@
+/* Readable About-page typography; the explorer keeps its own styles. */
+.about-page .cohort-note,
+.about-page .study-intro>p:not(.eyebrow),
+.about-page .details-copy{font-size:17px;line-height:1.75;color:#525252}
+.about-page .cohort-note{margin-top:0;margin-bottom:30px}
+.about-page .eyebrow{font-size:13px;line-height:1.5}
+.about-page .study-intro>p:not(.eyebrow){max-width:56ch}
+.about-page .study-intro>a,
+.about-page .data-links,
+.about-page .authors,
+.about-page .citation-note{font-size:16px;line-height:1.7;color:#525252}
+.about-page .modality-cards{gap:28px}
+.about-page .modality-cards h3{font-size:20px;line-height:1.4;margin-bottom:8px}
+.about-page .modality-cards p{font-size:16px;line-height:1.7;color:#525252;max-width:44ch}
+.about-page .study-details summary{font-size:17px;line-height:1.6;min-height:44px}
+.about-page .details-copy p{margin:0 0 18px}
+.about-page .data-links{display:flex;flex-wrap:wrap;gap:12px 22px}
+.about-page .paper-name{font-size:21px;line-height:1.5}
+.about-page .dataset-table-wrap{overflow-x:auto;overscroll-behavior-x:contain}
+.about-page .dataset-table{font-size:16px}
+.about-page .dataset-table thead th{font-size:17px;line-height:1.5}
+.about-page .dataset-table thead th span{font-size:15px;line-height:1.5}
+.about-page .dataset-table tbody th{font-size:16px;line-height:1.6;color:#525252}
+.about-page .dataset-table td{font-size:22px}
+.about-page .diagnosis-vocabulary,
+.about-page .dataset-source{font-size:16px;line-height:1.7;color:#606060}
+.about-page .site-footer>p,
+.about-page .site-footer>div{font-size:14px;line-height:1.6}
+.about-page .site-header nav{font-size:14px}
+@media(max-width:580px){
+ .about-page .site-header nav{gap:12px}
+ .about-page .dataset-table{min-width:480px}
+ .about-page .dataset-table thead th{font-size:16px}
+ .about-page .dataset-table thead th span{font-size:14px}
+ .about-page .dataset-table td{font-size:19px}
+ .about-page .site-footer>div{font-size:14px;max-width:none;justify-content:flex-start;width:100%;gap:12px}
+}
+
+.about-page .sae-quality-section{padding-top:30px;padding-bottom:42px}
+.about-page .sae-quality-section h2{font-size:30px;font-weight:550;letter-spacing:-1px;margin:0 0 16px}
+.about-page .sae-quality-section>p{font-size:17px;line-height:1.7;color:#525252;margin:0 0 22px}
+.about-page .sae-quality-section .sae-quality-note{font-size:16px;margin:18px 0 0}
+.about-page .sae-quality-table{min-width:680px}
+.about-page .sae-quality-table tbody th{width:28%}
+@media(max-width:580px){.about-page .sae-quality-section h2{font-size:26px}}

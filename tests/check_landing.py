@@ -82,8 +82,7 @@ def check():
             assert ' '.join(page.locator('.scroll-cue').inner_text().split())=='Scroll to explore ↓'
             assert frame.locator('.assoc tbody tr:visible').count()==3
             expected_rows=frame.locator('.assoc tbody tr').count()
-            frame.locator('#side').hover()
-            page.mouse.wheel(0,500)
+            frame.get_by_role('button',name='I26',exact=True).click()
             page.wait_for_function('!guidedEnabled')
             frame.locator('#association-more').click()
             assert frame.locator('.assoc tbody tr:visible').count()==expected_rows
@@ -227,7 +226,9 @@ def check():
             expected=frame.evaluate('() => DATA.associations[String(DATA.nodes.find(n=>n.name==="I109").i)].length')
             assert spokes==frame.evaluate('(A[selectedNode.i]||[]).filter(a=>a.odds_ratio>1).length')
             assert frame.locator('.wheel').get_attribute('data-scale')=='sqrt-or-minus-one'
-            assert frame.locator('.wheel-window').inner_text()=='First recorded onset 1–4 years after the CT scan.'
+            assert frame.locator('.wheel-window').inner_text().startswith('First recorded onset 1–4 years after the CT scan. ')
+            assert frame.locator('.wheel-count,.concept-modality').count()==0
+            assert frame.locator('table.assoc').evaluate("el=>el.previousElementSibling.textContent")=='Top outcomes by odds ratio, with Bonferroni-adjusted p-values.'
             assert frame.get_by_role('heading',name='Association wheel',exact=True).count()==1
             assert frame.locator('.wheel-family-label').count()==11
             assert frame.evaluate("""() => {
@@ -270,6 +271,8 @@ def check():
             assert frame.locator('#camera').get_attribute('transform')!=camera or frame.evaluate('scale===1')
             assert frame.evaluate('() => DATA.nodes.map(n=>[n.concept_id,n.x,n.y])')==before
             checks.append('Reset view clears diseases, selected concept and search; restores initial colors, zoom and filters')
+            page.evaluate('finishStory()')
+            frame.wait_for_function('!DATA.story_wheel_locked && !DATA.guided_mode')
             assert frame.evaluate("""async () => {
               let renders=0;const observer=new MutationObserver(records=>renders+=records.length);
               observer.observe(camera,{attributes:true,attributeFilter:['transform']});
@@ -333,6 +336,40 @@ def check():
             assert about.locator('h1').inner_text()=='About Glyph'
             about.close()
             checks.append('Two paper timelines, 67 interactive markers, 24 paper links, keyboard details and About page')
+            assert page.locator('.timeline-adjustment-note').count()==2
+            assert page.locator('.timeline-intro').evaluate('el=>parseFloat(getComputedStyle(el).fontSize)')>=17
+            for axis in page.locator('.timeline-figure .ytitle').all():assert axis.text_content()=='Odds Ratio*'
+            checks.append('Concise odds-ratio axes, accurate age/sex/race footnotes and readable timeline introduction')
+            inspection=context.new_page();inspection.on('pageerror',lambda error:errors.append(str(error)))
+            inspection.goto(url);inspection.locator('#atlas-loading').wait_for(state='hidden')
+            inf=inspection.locator('#concept-atlas').element_handle().content_frame();inf.wait_for_function('DATA.associations_ready')
+            inspection.evaluate("()=>{const s=storySteps[3],r=s.getBoundingClientRect();scrollTo({top:scrollY+r.top+r.height/2-innerHeight/2-200,behavior:'instant'})}")
+            inspection.wait_for_function('activeStory===3');inf.wait_for_function("selectedNode?.name==='L108' && scrollCameraFrame===null")
+            inf.get_by_role('button',name='I87',exact=True).click()
+            inspection.wait_for_function('!guidedEnabled');inf.wait_for_function("selectedNode?.name==='I87' && DATA.story_wheel_locked")
+            old_y=inspection.evaluate('scrollY');old_scale=inf.evaluate('scale');bounds=inf.locator('#graph').bounding_box()
+            inspection.mouse.move(bounds['x']+bounds['width']/2,bounds['y']+bounds['height']/2);inspection.mouse.wheel(0,100)
+            inspection.wait_for_function('guidedEnabled');inspection.wait_for_function('y=>Math.abs(scrollY-y-100)<2',arg=old_y)
+            inf.wait_for_function("DATA.guided_mode && selectedNode?.name==='L108'")
+            assert inf.evaluate('scale')>=old_scale-.001
+            # Closing details and changing zoom must not detach the unfinished tour.
+            inf.locator('#clearSelection').click()
+            inf.locator('#zoomIn').click()
+            inspection.wait_for_function('!guidedEnabled')
+            bounds=inf.locator('#graph').bounding_box()
+            inspection.mouse.move(bounds['x']+bounds['width']/2,bounds['y']+bounds['height']/2)
+            inspection.mouse.wheel(0,-100)
+            inspection.wait_for_function('guidedEnabled')
+            inf.wait_for_function('DATA.guided_mode && DATA.story_wheel_locked')
+            inf.locator('#zoomOut').click()
+            inspection.wait_for_function('!guidedEnabled')
+            inf.locator('#zoomOut').press('PageDown')
+            inspection.wait_for_function('guidedEnabled')
+            assert inspection.locator('#concept-atlas').evaluate('el=>el.nextElementSibling.classList.contains("network-controls")')
+            assert inf.locator('.legend').evaluate('el=>el.getBoundingClientRect().top')<=5
+            inspection.close()
+            checks.append('Node inspection, closing details and zoom controls preserve story resumption by wheel and keyboard')
+
             revisit=context.new_page();revisit.on('pageerror',lambda error:errors.append(str(error)))
             revisit.goto(url);revisit.locator('#atlas-loading').wait_for(state='hidden')
             rf=revisit.locator('#concept-atlas').element_handle().content_frame()

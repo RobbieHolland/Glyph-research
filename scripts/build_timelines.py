@@ -18,6 +18,30 @@ AXES=[('hfpef','04_abdominal_hfpef','Heart failure with preserved ejection fract
 FIELDS=('kind','marker','label','or_sd','lo','hi','p','q','url','title','novelty','note')
 
 
+def format_axis_note(svg):
+    axis=svg.find(f'.//{{{NS}}}text[@class="ytitle"]')
+    if axis is None:raise ValueError('Missing timeline odds-ratio axis')
+    previous=''.join(axis.itertext())
+    old_note=svg.find(f'{{{NS}}}text[@class="timeline-axis-note"]')
+    match=re.search(r'N = ([\d,]+) studies',previous+(''.join(old_note.itertext()) if old_note is not None else ''))
+    if not match:raise ValueError('Missing timeline study count')
+    for child in list(axis):axis.remove(child)
+    axis.text='Odds Ratio*'
+    caption='* Adjusted for patient age, sex, and recorded race; per Discovery-site SD. N = '+match.group(1)+' studies.'
+    if old_note is not None:svg.remove(old_note)
+    svg.set('viewBox','0 70 2700 980')
+    note=ET.SubElement(svg,f'{{{NS}}}text',{'class':'timeline-axis-note','x':'161','y':'1015','font-family':'Helvetica,Arial,sans-serif','font-size':'30','fill':'#606060'})
+    note.text=caption
+    return caption
+
+
+def inline_timeline(svg):
+    inline=deepcopy(svg);inline.set('viewBox','0 70 2700 920')
+    for node in list(inline):
+        if node.get('class')=='timeline-axis-note':inline.remove(node)
+    return ET.tostring(inline,encoding='unicode')
+
+
 def build(source_root,site_root):
     assets=site_root/'docs/assets/timelines';assets.mkdir(parents=True,exist_ok=True)
     sections=[];metadata={};sources={};counts={}
@@ -82,17 +106,19 @@ def build(source_root,site_root):
                     value=value.replace('url(#'+old+')','url(#'+new+')')
                     if value=='#'+old:value='#'+new
                 el.set(attr,value)
+        caption=format_axis_note(svg)
         rendered=ET.tostring(svg,encoding='unicode')
+        inline_rendered=inline_timeline(svg)
         for forbidden in ('/dataNAS/','/home/','patient_id','anon_accession'):assert forbidden not in rendered+json.dumps(metadata)
         (assets/(key+'.svg')).write_text(rendered)
         refs=''.join('<li><a href="'+html.escape(url,quote=True)+'" target="_blank" rel="noopener noreferrer">'+html.escape(name)+' <span aria-hidden="true">↗</span></a></li>' for url,name in references.items())
         heading=f'<span class="timeline-marker-scope">Abdominal CT and laboratory risk markers</span><span class="timeline-outcome">Onset of {html.escape(outcome_title[0].lower()+outcome_title[1:])}</span>'
-        sections.append(f'<article class="timeline-example" id="timeline-{key}"><div class="timeline-example-heading"><h3>{heading}</h3><a href="assets/timelines/{key}.svg" target="_blank" rel="noopener">Open figure ↗</a></div><div class="timeline-scroll" tabindex="0" aria-label="Scrollable {html.escape(title)} timeline">{rendered}</div><details class="timeline-references"><summary>References ({len(references)})</summary><ol>{refs}</ol></details></article>')
+        sections.append(f'<article class="timeline-example" id="timeline-{key}"><div class="timeline-example-heading"><h3>{heading}</h3><a href="assets/timelines/{key}.svg" target="_blank" rel="noopener">Open figure ↗</a></div><div class="timeline-scroll" tabindex="0" aria-label="Scrollable {html.escape(title)} timeline">{inline_rendered}</div><p class="timeline-adjustment-note">{html.escape(caption)}</p><details class="timeline-references"><summary>References ({len(references)})</summary><ol>{refs}</ol></details></article>')
         sources[key]={name:hashlib.sha256((source/name).read_bytes()).hexdigest() for name in ('timeline.svg','timeline.plotly.json')}
         counts[key]=dict(points=npoints,references=len(references))
     (assets/'points.json').write_text(json.dumps(metadata,separators=(',',':'),ensure_ascii=False,allow_nan=False))
     (assets/'provenance.json').write_text(json.dumps(dict(method='Frozen paper SVGs; plotted estimates and annotation placement unchanged. Page headings replace figure titles. Hover metadata is restricted to aggregate estimates and bibliographic fields.',source_sha256=sources,counts=counts),indent=2))
-    section='<!-- TIMELINES START -->\n<section id="timelines" class="timelines-section page-shell" aria-labelledby="timelines-title"><h2 id="timelines-title">Concepts complement clinical literature</h2><p class="timeline-intro">Clinically adjusted associations alongside prior studies. Hover for values; click a marker or reference for details.</p>'+''.join(sections)+'</section>\n<dialog id="timeline-detail" aria-labelledby="timeline-detail-title"><button id="timeline-close" type="button" aria-label="Close details">×</button><div id="timeline-detail-body"></div></dialog><div id="timeline-tooltip" role="tooltip" hidden></div><script type="application/json" id="timeline-points">'+json.dumps(metadata,separators=(',',':'),ensure_ascii=False).replace('</','<\\/')+'</script>\n<!-- TIMELINES END -->'
+    section='<!-- TIMELINES START -->\n<section id="timelines" class="timelines-section page-shell" aria-labelledby="timelines-title"><h2 id="timelines-title">Concepts complement clinical literature</h2><p class="timeline-intro">Compare Glyph concepts with published risk markers. Click any marker for details.</p>'+''.join(sections)+'</section>\n<dialog id="timeline-detail" aria-labelledby="timeline-detail-title"><button id="timeline-close" type="button" aria-label="Close details">×</button><div id="timeline-detail-body"></div></dialog><div id="timeline-tooltip" role="tooltip" hidden></div><script type="application/json" id="timeline-points">'+json.dumps(metadata,separators=(',',':'),ensure_ascii=False).replace('</','<\\/')+'</script>\n<!-- TIMELINES END -->'
     page=site_root/'docs/index.html';content=page.read_text()
     if '<!-- TIMELINES START -->' in content:content=re.sub(r'<!-- TIMELINES START -->.*?<!-- TIMELINES END -->',lambda _:section,content,flags=re.S)
     else:
