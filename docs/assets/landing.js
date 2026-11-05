@@ -3,6 +3,18 @@ const modeButtons=[...document.querySelectorAll('[data-mode]')],guideToggle=docu
 const initialConcept=new URLSearchParams(location.search).get('concept');
 let associationsReady=false,atlasReady=false,activeStory=0,lastAppliedStory=-1,guidedEnabled=!initialConcept,pendingOutcomeShortcut=null,overviewSettled=false,heldGraphScroll=null,gateAdjusting=false;
 const storySteps=[...document.querySelectorAll('.story-step')];
+// Phones use one caption below the network; original steps remain scroll triggers.
+const phoneStory=matchMedia('(max-width: 850px)'),mobileCaption=document.createElement('section');
+mobileCaption.id='mobile-story-caption';mobileCaption.className='mobile-story-caption story-step-copy';mobileCaption.setAttribute('aria-label','Current story');
+frame.after(mobileCaption);
+function syncMobileCaption(){
+ mobileCaption.setAttribute('aria-hidden',String(!phoneStory.matches));
+ if(!phoneStory.matches)return;
+ const step=storySteps[activeStory];mobileCaption.innerHTML=step.querySelector('.story-step-copy').innerHTML;
+ mobileCaption.style.setProperty('--story-accent',step.style.getPropertyValue('--story-accent'));mobileCaption.scrollTop=0;
+}
+phoneStory.addEventListener('change',syncMobileCaption);
+
 function send(message){frame.contentWindow?.postMessage(message,'*')}
 function syncMode(mode){modeButtons.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.mode===mode)))}
 function setGuided(enabled,revealTools=false){
@@ -90,7 +102,7 @@ function applyStory(){
  updateDiseaseHeading(step.dataset.disease);updateStoryProgress();
 }
 function markStory(index){
- activeStory=index;storySteps.forEach((step,i)=>step.classList.toggle('is-active',i===index));applyStory();
+ const changed=activeStory!==index;activeStory=index;storySteps.forEach((step,i)=>step.classList.toggle('is-active',i===index));if(changed||!mobileCaption.childElementCount)syncMobileCaption();applyStory();
 }
 const storyObserver=new IntersectionObserver(entries=>{
  for(const entry of entries)entry.target.dataset.visibility=String(entry.isIntersecting?entry.intersectionRatio:0);
@@ -133,6 +145,12 @@ if(initialConcept)setGuided(false);
 const atlasSearch=document.getElementById('atlas-search'),atlasResults=document.getElementById('atlas-search-results');
 atlasSearch.addEventListener('input',()=>{setGuided(false);send({type:'glyph:search',query:atlasSearch.value})});
 document.getElementById('atlas-reset').onclick=()=>{setGuided(false);atlasSearch.value='';atlasResults.hidden=true;send({type:'glyph:reset'})};
+// Keep help available when the static timeline builder replaces the dialog block.
+if(!document.getElementById('atlas-help-dialog')){
+ const dialog=document.createElement('dialog');dialog.id='atlas-help-dialog';dialog.setAttribute('aria-labelledby','atlas-help-title');
+ dialog.innerHTML='<button id="atlas-help-close" type="button" aria-label="Close help">×</button><h2 id="atlas-help-title">Explore the concept space</h2><p>Choose a disease to highlight concepts associated with higher risk (OR &gt; 1).</p><p>Search by concept code or description. Click any dot for its interpretation, association wheel, odds ratios, and p-values.</p><p>Drag to pan, and use + and − to zoom. Reset view returns to the full map. Resume scroll guide restarts the guided exploration.</p>';
+ document.body.appendChild(dialog);
+}
 document.getElementById('atlas-help').onclick=()=>{document.getElementById('atlas-help-dialog').showModal()};
 document.getElementById('atlas-help-close').onclick=()=>document.getElementById('atlas-help-dialog').close();
 window.addEventListener('message',event=>{

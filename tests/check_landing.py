@@ -341,6 +341,17 @@ def check():
             assert m.locator('.timeline-scroll').first.evaluate('el=>el.scrollWidth>el.clientWidth')
             mf=m.locator('#concept-atlas').element_handle().content_frame()
             assert mf.locator('.hit').count()==347
+            m.evaluate("() => {const step=document.querySelector('.story-step[data-concept=\"L108\"]');scrollTo({top:scrollY+step.getBoundingClientRect().top-innerHeight*.35,behavior:'instant'})}")
+            m.wait_for_function('activeStory===3')
+            mf.wait_for_function("selectedNode?.name==='L108' && DATA.guided_mode")
+            caption=m.locator('#mobile-story-caption');assert caption.is_visible()
+            assert m.locator('.story-steps').evaluate("el=>getComputedStyle(el).visibility")=="hidden"
+            graph_box=m.locator('#concept-atlas').bounding_box();caption_box=caption.bounding_box()
+            assert caption_box['y']>=graph_box['y']+graph_box['height']-1
+            assert not mf.locator('#side').is_visible()
+            assert not page.locator('#mobile-story-caption').is_visible()
+            checks.append('Phone narration stays below the full-width network; desktop retains its left story column')
+
             m.locator('#atlas').scroll_into_view_if_needed();m.locator('#choose-diseases').click()
             mf.locator('#outcomePicker[open]>.outcomes').wait_for()
             assert mf.locator('#outcomePicker').get_attribute('open') is not None

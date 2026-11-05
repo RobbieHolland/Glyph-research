@@ -167,3 +167,9 @@ button,input,summary{font-size:14px}
 .parent-controls #toolbar{top:0;left:12px;right:auto}
 .parent-controls #toolbar #outcomePicker>.outcomes{top:0}
 #displaySettings label[hidden]{display:none!important}
+
+/* The phone guide presents details in its caption; tapping a node opens manual details. */
+@media(max-width:850px){
+ .parent-controls.guided-view #app.has-selection{grid-template-columns:1fr;grid-template-rows:1fr}
+ .parent-controls.guided-view #side{display:none}
+}

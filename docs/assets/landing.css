@@ -215,3 +215,21 @@ body{background:#fff;color:#171717}
 /* Match the guided disease narrative to the outcome hue on the network. */
 .story-step .story-accent-heading{color:var(--story-accent,#252525)}
 .story-disease-accent{color:var(--story-accent,#252525);font-weight:500}
+
+/* Phone-only narration: a stable caption below the network, never over its nodes. */
+.mobile-story-caption{display:none}
+@media(max-width:850px){
+ .story-visual #concept-atlas,.story-visual #concept-atlas[data-selected=true]{height:32svh;min-height:200px;max-height:340px}
+ .story-steps{visibility:hidden;z-index:0;margin-top:0}
+ .mobile-story-caption{display:block;box-sizing:border-box;width:100%;margin:0;padding:15px 4px 10px;border-top:1px solid #ededed;background:#fff;text-align:left;max-height:28svh;overflow-y:auto;overscroll-behavior:contain}
+ .mobile-story-caption h3{font-size:21px;font-weight:500;line-height:1.2;letter-spacing:-.5px;margin:0 0 8px;color:var(--story-accent,#252525)}
+ .mobile-story-caption>p{font-size:14px;line-height:1.5;margin:0 0 9px}
+ .mobile-story-caption .step-label{font-size:11px;color:#737373;margin:0 0 7px}
+ .mobile-story-caption .story-prompt{padding:9px 11px;margin:0 0 11px}
+ .mobile-story-caption .story-prompt-text{font-size:14px}
+ .mobile-story-caption .story-prompt-label{font-size:9px;margin-bottom:4px}
+ .mobile-story-caption .story-marker-results{margin-top:11px}
+ .mobile-story-caption .story-marker{padding:6px 0}
+ #atlas[data-manual=true] .mobile-story-caption{display:none}
+ #atlas[data-manual=true] .story-visual #concept-atlas{height:52svh;min-height:360px;max-height:560px}
+}
