@@ -25,7 +25,8 @@ def build(source_root,site_root):
     rules=json.loads(rules_path.read_text()) if rules_path.exists() else {}
     atlas=json.loads((site_root/'docs/assets/atlas-data.json').read_text())
     descriptions={node['name']:node for node in atlas['nodes']}
-    for key,folder,title in AXES:
+    for key,folder,outcome_title in AXES:
+        title='Abdominal CT and laboratory risk markers for the onset of '+outcome_title[0].lower()+outcome_title[1:]
         source=source_root/folder
         figure=json.loads((source/'timeline.plotly.json').read_text())
         tree=ET.parse(source/'timeline.svg');svg=tree.getroot()
@@ -85,7 +86,8 @@ def build(source_root,site_root):
         for forbidden in ('/dataNAS/','/home/','patient_id','anon_accession'):assert forbidden not in rendered+json.dumps(metadata)
         (assets/(key+'.svg')).write_text(rendered)
         refs=''.join('<li><a href="'+html.escape(url,quote=True)+'" target="_blank" rel="noopener noreferrer">'+html.escape(name)+' <span aria-hidden="true">↗</span></a></li>' for url,name in references.items())
-        sections.append(f'<article class="timeline-example" id="timeline-{key}"><div class="timeline-example-heading"><h3>{html.escape(title)}</h3><a href="assets/timelines/{key}.svg" target="_blank" rel="noopener">Open figure ↗</a></div><div class="timeline-scroll" tabindex="0" aria-label="Scrollable {html.escape(title)} timeline">{rendered}</div><details class="timeline-references"><summary>References ({len(references)})</summary><ol>{refs}</ol></details></article>')
+        heading=f'<span class="timeline-marker-scope">Abdominal CT and laboratory risk markers</span><span class="timeline-outcome">Onset of {html.escape(outcome_title[0].lower()+outcome_title[1:])}</span>'
+        sections.append(f'<article class="timeline-example" id="timeline-{key}"><div class="timeline-example-heading"><h3>{heading}</h3><a href="assets/timelines/{key}.svg" target="_blank" rel="noopener">Open figure ↗</a></div><div class="timeline-scroll" tabindex="0" aria-label="Scrollable {html.escape(title)} timeline">{rendered}</div><details class="timeline-references"><summary>References ({len(references)})</summary><ol>{refs}</ol></details></article>')
         sources[key]={name:hashlib.sha256((source/name).read_bytes()).hexdigest() for name in ('timeline.svg','timeline.plotly.json')}
         counts[key]=dict(points=npoints,references=len(references))
     (assets/'points.json').write_text(json.dumps(metadata,separators=(',',':'),ensure_ascii=False,allow_nan=False))

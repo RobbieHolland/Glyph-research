@@ -2,7 +2,7 @@
 
 The public site is static HTML/CSS/JavaScript served by GitHub Pages. It does not
 run Python, fetch private datasets, require an API key, or contain patient records.
-The expected permanent address is https://robbieholland.github.io/Glyph-research/.
+The expected permanent address is https://stanfordmimi.github.io/Glyph-research/.
 
 The landing page embeds `atlas-embed.html`; `atlas.html` is the standalone view, both, adapted from Glyph's standalone interactive
 explorer. The upstream template and its MIT license are retained in `vendor/`.
