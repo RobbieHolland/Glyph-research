@@ -48,7 +48,12 @@ def build(root):
             question=question.replace(phrase,f'<span class="story-disease-accent">{phrase}</span>')
         prompt_html=('<div class="story-prompt"><span class="story-prompt-label">You ask Glyph</span><p class="story-prompt-text">'+question+'</p></div>') if concept in questions else ''
         hint_html=f'<p class="step-hint">{hint}</p>' if hint else ''
-        html+=f'<section class="story-step{" is-active" if i==0 else ""}" {attributes} aria-label="{title}"><div class="story-step-copy">{prompt_html}{label_html}<h3 class="story-accent-heading">{title}</h3><p>{body}</p>{stats}{hint_html}</div></section>\n'
+        if i<len(sections)-1:
+            prefix='Renal risk markers for ' if concept=='L84' else 'Cardiovascular risk markers for ' if concept=='I26' else 'Risk markers for '
+            heading_html=prefix+f'<span class="story-disease-accent">{disease}</span>'
+        else:heading_html=title
+
+        html+=f'<section class="story-step{" is-active" if i==0 else ""}" {attributes} aria-label="{title}"><div class="story-step-copy">{prompt_html}{label_html}<h3 class="story-accent-heading">{heading_html}</h3><p>{body}</p>{stats}{hint_html}</div></section>\n'
     html+='</div>'
     start=text.index('<div class="story-steps">');end=text.index('</div></div>\n    </section>',start)+len('</div>')
     text=text[:start]+html+text[end:]

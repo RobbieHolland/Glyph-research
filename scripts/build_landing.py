@@ -79,9 +79,10 @@ def export(args):
             interpretation='' if pd.isna(match.extracted_interpretation) else re.sub(r'^This cohort is characterized by\s*','',str(match.extracted_interpretation),flags=re.I)
             if name in revised:
                 interpretation=str(revised[name]);revised_used.append(name)
+            if str(interpretation).strip().casefold() in {'nan','none','null','<na>'}:interpretation=''
             accuracy=optional(match.get('test_interpretation_discrimination_accuracy'))
             if accuracy is not None:accuracy*=100
-            if name in revised:accuracy=None  # Old AutoInterp accuracy does not validate revised wording.
+            if name in revised or not interpretation:accuracy=None  # Scores do not validate revised or absent wording.
         area=150+1000*(source['size']-smallest)/(largest-smallest)
         nodes.append(dict(i=index,concept_id=key,feature_idx=int(key.split('_')[-1]) if not clinical else index,
             name=name,x=float(row.x_frac),y=float(row.y_frac),modality=modality,embedding_family='default',
@@ -134,6 +135,8 @@ const NS='http://www.w3.org/2000/svg',S=1000,BASE_NODE_OPACITY=1;'''
     template=template.replace('data-association="${i}" data-outcome=', 'data-association="${(A[n.i]||[]).indexOf(a)}" data-outcome=')
     template=template.replace('Hover for values; lower-odds estimates are available on hover and in the table.', 'Hover for values. Only higher-risk estimates (OR > 1) are shown.')
 
+    template=template.replace("n.interpretation||'No interpretation available.'", "n.interpretation||''")
+    template=template.replace("function showTip(e,n){tip.textContent=n.interpretation||'No interpretation available';moveTip(e)}", "function showTip(e,n){tip.textContent=n.interpretation||'';if(!tip.textContent){tip.style.opacity=0;return}moveTip(e)}")
     template=template.replace('selected.clear();selected.add(DATA.initial_outcome);','selected.clear();')
     template=template.replace('${DATA.nodes.length.toLocaleString()} concepts · ${hits.toLocaleString()}', '${DATA.nodes.length.toLocaleString()} nodes · ${hits.toLocaleString()}')
     template=template.replace("if(isSimple)return;activeRankSort=sortOutcome;", "if(isSimple)return;activeRankSort=sortOutcome;")

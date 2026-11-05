@@ -333,6 +333,51 @@ def check():
             assert about.locator('h1').inner_text()=='About Glyph'
             about.close()
             checks.append('Two paper timelines, 67 interactive markers, 24 paper links, keyboard details and About page')
+            revisit=context.new_page();revisit.on('pageerror',lambda error:errors.append(str(error)))
+            revisit.goto(url);revisit.locator('#atlas-loading').wait_for(state='hidden')
+            rf=revisit.locator('#concept-atlas').element_handle().content_frame()
+            rf.wait_for_function('DATA.associations_ready')
+            long_height=revisit.evaluate('document.documentElement.scrollHeight')
+            hold_center=revisit.evaluate("() => {const s=storySteps[3],r=s.getBoundingClientRect();return scrollY+r.top+r.height/2-innerHeight/2}")
+            revisit.evaluate("y=>scrollTo({top:y,behavior:'instant'})",hold_center-350)
+            revisit.wait_for_function('activeStory===3')
+            rf.wait_for_function("selectedNode?.name==='L108'")
+            revisit.wait_for_timeout(150)
+            held_copy=revisit.locator('.story-step[data-concept="L108"] .story-step-copy')
+            first_box=held_copy.bounding_box();first_center=first_box['y']+first_box['height']/2
+            revisit.evaluate("y=>scrollTo({top:y,behavior:'instant'})",hold_center+350)
+            revisit.wait_for_timeout(150)
+            last_box=held_copy.bounding_box()
+            assert abs(last_box['y']+last_box['height']/2-first_center+210)<2
+            assert abs(first_center-645)<2
+            checks.append('700 pixels of scroll move centered story text by 210 pixels: a longer continuous slow passage')
+
+            revisit.evaluate("() => {const s=storySteps[6];scrollTo({top:scrollY+s.getBoundingClientRect().top+s.offsetHeight/2-innerHeight/2,behavior:'instant'})}")
+            revisit.wait_for_function('activeStory===6')
+            revisit.evaluate('scrollWithGraphGate(20000)')
+            revisit.wait_for_function('storyCompleted && !guidedEnabled && heldGraphScroll===null')
+            assert long_height-revisit.evaluate('document.documentElement.scrollHeight')>3000
+            assert revisit.locator('#guide-toggle').inner_text()=='Replay story'
+            revisit.evaluate("scrollTo({top:0,behavior:'instant'})")
+            revisit.wait_for_function('scrollY===0')
+            assert revisit.locator('#story-progress-fill').evaluate('el=>getComputedStyle(el).transform')=='matrix(1, 0, 0, 1, 0, 0)'
+            revisit.locator('#guide-toggle').click()
+            revisit.wait_for_function('guidedEnabled && !storyCompleted && activeStory===0')
+            assert revisit.locator('.story-steps').evaluate('el=>getComputedStyle(el).display')!='none'
+            revisit.evaluate("() => {const s=storySteps[3],r=s.getBoundingClientRect();scrollTo({top:scrollY+r.top+r.height/2-innerHeight/2-250,behavior:'instant'})}")
+            revisit.wait_for_function('activeStory===3')
+            revisit.wait_for_timeout(150)
+            before_wheel=revisit.evaluate('scrollY');before_box=held_copy.bounding_box()
+            revisit.mouse.move(20,800);revisit.mouse.wheel(0,100)
+            revisit.wait_for_function('y=>Math.abs(scrollY-y-100)<2',arg=before_wheel)
+            revisit.wait_for_timeout(150)
+            after_box=held_copy.bounding_box()
+            assert abs(after_box['y']-before_box['y']+30)<2
+            checks.append('Native wheel scrolling stays continuous while story text slows through its focus')
+
+            revisit.close()
+            checks.append('Finished story removes dead scroll space, allows direct return to top, and replays only when requested')
+
             page.screenshot(path=str(ARTIFACTS/'desktop-full.png'),full_page=True)
             mobile=browser.new_context(viewport={'width':390,'height':844},device_scale_factor=1,is_mobile=True,has_touch=True)
             m=mobile.new_page();m.on('pageerror',lambda error:errors.append(str(error)))

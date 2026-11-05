@@ -120,6 +120,7 @@ function updateConceptMarker(n){
  for(const [stroke,width] of [['#fff',6],['#171717',2.5]]){
   const ring=circle(x,y,r,'none');ring.setAttribute('stroke',stroke);ring.setAttribute('stroke-width',width);ring.setAttribute('vector-effect','non-scaling-stroke');selectedConceptMarker.appendChild(ring);
  }
+ if(['patient_age','current_smoker'].includes(n.concept_id)){selectedConceptMarker.dataset.concept=n.name;return}
  const yLabel=y-r-12/scale,width=(n.name.length*11+14)/scale,height=25/scale;
  const background=document.createElementNS(NS,'rect');background.setAttribute('x',x-width/2);background.setAttribute('y',yLabel-18/scale);background.setAttribute('width',width);background.setAttribute('height',height);background.setAttribute('rx',4/scale);background.setAttribute('fill','#fff');
  const text=document.createElementNS(NS,'text');text.setAttribute('x',x);text.setAttribute('y',yLabel);text.setAttribute('text-anchor','middle');text.setAttribute('font-size',18/scale);text.setAttribute('font-weight','700');text.setAttribute('fill',modalityColor(n.modality));text.textContent=n.name;
@@ -238,9 +239,11 @@ const sourceShow=show;
 show=function(n){
  if(DATA.progressive_associations&&!n.associations_ready)window.loadAssociationForNode?.(n.i);
  sourceShow(n);
+ if(n.interpretation){
  const report=document.getElementById('detail');
  const badge=document.createElement('span');badge.className='interpretation-note';badge.textContent=n.interpretation_source||'Concept interpretation';
  const heading=report.querySelector('.concept-heading');if(heading)heading.after(badge);else report.prepend(badge);
+ }
  notifyParent('glyph:selection',{concept:n.name});
 };
 const sourceClear=clearSelection;
@@ -327,7 +330,7 @@ function renderConceptResults(){
  const count=document.createElement('div');count.className='concept-results-count';count.textContent=matches.length?'Matching concepts':'No matching concepts';conceptResults.appendChild(count);
  matches.slice(0,12).forEach(n=>{
   const button=document.createElement('button');button.type='button';button.className='concept-result';
-  const id=document.createElement('strong'),interpretation=document.createElement('span');id.textContent=n.name;id.style.color=modalityColor(n.modality);interpretation.textContent=n.interpretation||'No interpretation available';button.append(id,interpretation);
+  const id=document.createElement('strong'),interpretation=document.createElement('span');id.textContent=n.name;id.style.color=modalityColor(n.modality);interpretation.textContent=n.interpretation||'';button.append(id,interpretation);
   button.onclick=()=>{conceptSearch.value='';applyFilters();show(n);hideConceptResults()};conceptResults.appendChild(button);
  });
  if(matches.length>12){const note=document.createElement('div');note.className='concept-results-count';note.textContent='Type more to narrow the results.';conceptResults.appendChild(note)}
@@ -374,20 +377,15 @@ function roundedRegionPath(points){
 });
 const regionLabelBackdrops=document.createElementNS(NS,'g');regionLabelBackdrops.setAttribute('aria-hidden','true');
 [...regionLabelLayer.children].forEach(text=>regionLabelBackdrops.appendChild(labelBackdrop(text)));regionLabelLayer.prepend(regionLabelBackdrops);
-// Patient age is a clinical anchor, so label it separately from learned concepts.
-const ageNode=DATA.nodes.find(n=>n.concept_id==='patient_age');
-if(ageNode){
- const annotation=document.createElementNS(NS,'g');annotation.id='patientAgeAnnotation';annotation.setAttribute('pointer-events','none');
- const leader=document.createElementNS(NS,'path');leader.setAttribute('d',`M${ageNode.x*S+radius(ageNode)+3},${ageNode.y*S-2} L858,268`);leader.setAttribute('fill','none');leader.setAttribute('stroke','#858585');leader.setAttribute('stroke-width','.85');leader.setAttribute('vector-effect','non-scaling-stroke');
- const label=document.createElementNS(NS,'text');label.setAttribute('x','861');label.setAttribute('y','272');label.setAttribute('class','clinical-node-annotation');label.textContent='Patient age';annotation.append(leader,labelBackdrop(label),label);camera.appendChild(annotation);
+// Label these clinical anchors directly above their nodes, without leader lines.
+function labelClinicalAnchor(concept,id,title){
+ const node=DATA.nodes.find(n=>n.concept_id===concept);if(!node)return;
+ const annotation=document.createElementNS(NS,'g');annotation.id=id;annotation.setAttribute('pointer-events','none');
+ const label=document.createElementNS(NS,'text');label.setAttribute('x',node.x*S);label.setAttribute('y',node.y*S-radius(node)-12);label.setAttribute('text-anchor','middle');label.setAttribute('class','clinical-node-annotation');label.textContent=title;
+ annotation.append(labelBackdrop(label),label);camera.appendChild(annotation);
 }
-
-const smokingNode=DATA.nodes.find(n=>n.concept_id==='current_smoker');
-if(smokingNode){
- const annotation=document.createElementNS(NS,'g');annotation.id='smokingAnnotation';annotation.setAttribute('pointer-events','none');
- const leader=document.createElementNS(NS,'path');leader.setAttribute('d',`M${smokingNode.x*S+radius(smokingNode)+2},${smokingNode.y*S-2} L749,395`);leader.setAttribute('fill','none');leader.setAttribute('stroke','#858585');leader.setAttribute('stroke-width','.85');leader.setAttribute('vector-effect','non-scaling-stroke');
- const label=document.createElementNS(NS,'text');label.setAttribute('x','752');label.setAttribute('y','399');label.setAttribute('text-anchor','start');label.setAttribute('class','clinical-node-annotation');label.textContent='Smoking';annotation.append(leader,labelBackdrop(label),label);camera.appendChild(annotation);
-}
+labelClinicalAnchor('patient_age','patientAgeAnnotation','Patient age');
+labelClinicalAnchor('current_smoker','smokingAnnotation','Smoking');
 
 let regionsVisible=true;
 function setRegionsVisible(visible){regionsVisible=visible;regionLayer.style.display=visible?'':'none';regionLabelLayer.style.display=visible?'':'none';notifyParent('glyph:regions-state',{regionsVisible:visible})}

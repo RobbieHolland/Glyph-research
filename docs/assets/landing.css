@@ -233,3 +233,17 @@ body{background:#fff;color:#171717}
  #atlas[data-manual=true] .mobile-story-caption{display:none}
  #atlas[data-manual=true] .story-visual #concept-atlas{height:52svh;min-height:360px;max-height:560px}
 }
+
+/* A completed tour becomes a normal compact map, including on the way back up. */
+.story-shell[data-completed=true] .story-steps{display:none}
+.story-shell[data-completed=true] .story-visual{position:relative;top:auto}
+.story-shell[data-completed=true] .manual-story{position:relative;top:auto;align-self:start}
+
+/* More scroll distance at each desktop focus, with a slower passage through the middle. */
+@media(min-width:851px){
+ .story-step:not(:last-child){min-height:172svh}
+ .story-step .story-step-copy{transform:none;translate:0 var(--story-focus-offset,0px);transition:none}
+}
+
+/* Color the disease name, keeping the risk-marker wording neutral. */
+.story-step .story-accent-heading,.mobile-story-caption .story-accent-heading{color:#252525}

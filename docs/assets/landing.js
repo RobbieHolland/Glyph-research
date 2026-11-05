@@ -1,7 +1,7 @@
 const frame=document.getElementById('concept-atlas'),loading=document.getElementById('atlas-loading');
 const modeButtons=[...document.querySelectorAll('[data-mode]')],guideToggle=document.getElementById('guide-toggle'),manualTools=document.getElementById('explore-tools');
 const initialConcept=new URLSearchParams(location.search).get('concept');
-let associationsReady=false,atlasReady=false,activeStory=0,lastAppliedStory=-1,guidedEnabled=!initialConcept,pendingOutcomeShortcut=null,overviewSettled=false,heldGraphScroll=null,gateAdjusting=false;
+let associationsReady=false,atlasReady=false,activeStory=0,lastAppliedStory=-1,guidedEnabled=!initialConcept,pendingOutcomeShortcut=null,overviewSettled=false,heldGraphScroll=null,gateAdjusting=false,storyCompleted=false;
 const storySteps=[...document.querySelectorAll('.story-step')];
 // Phones use one caption below the network; original steps remain scroll triggers.
 const phoneStory=matchMedia('(max-width: 850px)'),mobileCaption=document.createElement('section');
@@ -18,11 +18,15 @@ phoneStory.addEventListener('change',syncMobileCaption);
 function send(message){frame.contentWindow?.postMessage(message,'*')}
 function syncMode(mode){modeButtons.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.mode===mode)))}
 function setGuided(enabled,revealTools=false){
- guidedEnabled=enabled;if(!enabled)heldGraphScroll=null;guideToggle.textContent=enabled?'Explore freely':'Resume scroll guide';guideToggle.setAttribute('aria-pressed',String(!enabled));
+ const replay=enabled&&storyCompleted;
+ if(replay){storyCompleted=false;delete storyShell.dataset.completed;activeStory=0;lastAppliedStory=-1;markStory(0)}
+ guidedEnabled=enabled;if(!enabled)heldGraphScroll=null;guideToggle.textContent=enabled?'Explore freely':storyCompleted?'Replay story':'Resume scroll guide';guideToggle.setAttribute('aria-pressed',String(!enabled));
  document.getElementById('atlas').dataset.manual=String(!enabled);send({type:'glyph:guided-mode',enabled});
  if(!enabled&&revealTools)manualTools.open=true;
  if(enabled){manualTools.open=false;lastAppliedStory=-1;applyStory()}
+ if(replay)window.scrollTo({top:scrollY+storyShell.getBoundingClientRect().top-94,behavior:'instant'});
 }
+
 function updateDiseaseHeading(label){
  const lower=label.toLowerCase();
  const pretty=label==='Cancer Liver Primary'?'Primary liver cancer':label.endsWith('(428.4)')||lower.includes('heart failure with preserved ef')?'Heart failure (HFpEF)':label.endsWith('(585.33)')||lower.includes('chronic kidney disease, stage iii')?'Kidney disease':label;
@@ -52,9 +56,23 @@ function graphReleaseY(){
  const stickyTop=parseFloat(getComputedStyle(visual).top)||0;
  return Math.floor(Math.max(0,scrollY+bounds.bottom-visual.getBoundingClientRect().height-stickyTop));
 }
-function needsGraphHold(target){return guidedEnabled&&atlasReady&&associationsReady&&!overviewSettled&&target>graphReleaseY()}
+function needsGraphHold(target){return !storyCompleted&&guidedEnabled&&atlasReady&&associationsReady&&!overviewSettled&&target>graphReleaseY()}
+function finishStory(){
+ if(storyCompleted)return;
+ // Anchor the following content while removing the finished tour's scroll space.
+ const anchor=document.getElementById('timelines'),before=anchor.getBoundingClientRect().top;
+ storyCompleted=true;heldGraphScroll=null;setGuided(false);
+ storyShell.dataset.completed='true';guideToggle.textContent='Replay story';
+ window.scrollBy({top:anchor.getBoundingClientRect().top-before,behavior:'instant'});
+ updateStoryProgress();
+}
+function storyFocusPositions(){
+ const positions=storySteps.map(step=>{const box=step.getBoundingClientRect();return scrollY+box.top+box.height/2-innerHeight/2});
+ positions[positions.length-1]=Math.min(positions[positions.length-1],graphReleaseY()-Math.min(220,innerHeight*.2));
+ return positions;
+}
 function scrollWithGraphGate(delta){
- if(delta<0)heldGraphScroll=null;
+ if(delta<0){heldGraphScroll=null;window.scrollBy({top:delta,behavior:'instant'});return false}
  const target=(heldGraphScroll??scrollY)+delta;
  if(needsGraphHold(target)){
   heldGraphScroll=Math.min(target,document.documentElement.scrollHeight-innerHeight);
@@ -63,32 +81,64 @@ function scrollWithGraphGate(delta){
  window.scrollBy({top:delta,behavior:'instant'});return false;
 }
 addEventListener('wheel',event=>{
- if(event.deltaY<0){heldGraphScroll=null;return}
+ if(event.deltaY<0)heldGraphScroll=null;
  if(event.ctrlKey||event.metaKey||event.deltaY===0)return;
  const unit=event.deltaMode===1?16:event.deltaMode===2?innerHeight:1;
- if(needsGraphHold((heldGraphScroll??scrollY)+event.deltaY*unit)){event.preventDefault();scrollWithGraphGate(event.deltaY*unit)}
+ const delta=event.deltaY*unit;
+ if(event.target.closest?.('dialog,input,textarea,select,.manual-options,#atlas-search-results'))return;
+ if(needsGraphHold((heldGraphScroll??scrollY)+delta)){
+  // Nested controls and dialogs retain their native scrolling.
+  if(event.target.closest?.('dialog,input,textarea,select,.manual-options,#atlas-search-results'))return;
+  event.preventDefault();scrollWithGraphGate(delta);
+ }
 },{passive:false});
 addEventListener('keydown',event=>{if(['ArrowUp','PageUp','Home'].includes(event.key))heldGraphScroll=null});
 // Also cover keyboard, touch momentum and scrollbar overshoots.
+let lastPageScrollY=scrollY;
 addEventListener('scroll',()=>{
+ const movingUp=scrollY<lastPageScrollY;lastPageScrollY=scrollY;
+ if(movingUp){heldGraphScroll=null;return;}
+ if(!storyCompleted&&atlasReady&&associationsReady&&scrollY>graphReleaseY()+2&&(!guidedEnabled||(overviewSettled&&activeStory===storySteps.length-1))){finishStory();return}
  if(gateAdjusting||!needsGraphHold(scrollY))return;
  heldGraphScroll=Math.max(heldGraphScroll??0,scrollY);gateAdjusting=true;
  window.scrollTo({top:graphReleaseY(),behavior:'instant'});updateStoryProgress();
  requestAnimationFrame(()=>gateAdjusting=false);
 },{passive:true});
+// Integrated smooth resistance: linear through the focus, gently released at its edges.
+function focusResistance(distance,span,strength){
+ if(span<=0)return 0;
+ const sign=Math.sign(distance),d=Math.abs(distance),core=span*.75,shoulder=span-core;
+ const t=Math.max(0,Math.min(1,(d-core)/shoulder));
+ const resisted=d<=core?d:core+shoulder*(t-t*t*t+.5*t*t*t*t);
+ return sign*strength*resisted;
+}
 function updateStoryProgress(){
+ if(storyProgressFrame!==null)cancelAnimationFrame(storyProgressFrame);
  storyProgressFrame=null;const bounds=storyShell.getBoundingClientRect();
- const progress=Math.max(0,Math.min(1,(innerHeight*.4-bounds.top)/Math.max(1,bounds.height-innerHeight*.6)));
+ const progress=storyCompleted?1:Math.max(0,Math.min(1,(innerHeight*.4-bounds.top)/Math.max(1,bounds.height-innerHeight*.6)));
  document.getElementById('story-progress-fill').style.transform=`scaleX(${progress})`;
  if(guidedEnabled&&atlasReady&&associationsReady){
   const anchor=innerHeight*.5,centers=storySteps.map(step=>{const box=step.getBoundingClientRect();return box.top+box.height*.5});
+  // Each desktop focus occupies nearly a viewport of real scroll distance.
+  // Let the text and camera keep moving, at a slower rate near the center.
+  const halfHold=phoneStory.matches?0:innerHeight*.45;
+  storySteps.forEach((step,index)=>{
+   const offset=index===storySteps.length-1?0:focusResistance(anchor-centers[index],halfHold,.7);
+   step.style.setProperty('--story-focus-offset',offset+'px');
+  });
   // Finish the pullback before the sticky map reaches its release edge.
   const visual=document.querySelector('.story-visual'),stickyTop=parseFloat(getComputedStyle(visual).top)||0;
   const finishBeforeRelease=Math.min(220,innerHeight*.2);
   centers[centers.length-1]=Math.min(centers[centers.length-1],bounds.bottom-visual.getBoundingClientRect().height-stickyTop-finishBeforeRelease+anchor);
 
   let segment=0;while(segment<centers.length-2&&anchor>centers[segment+1])segment++;
-  const phase=Math.max(0,Math.min(1,(anchor-centers[segment])/(centers[segment+1]-centers[segment])));
+  const distance=Math.max(1,centers[segment+1]-centers[segment]);
+  const traveled=Math.max(0,Math.min(distance,anchor-centers[segment]));
+  const slowStart=Math.min(halfHold,distance*.4),slowEnd=segment+1===storySteps.length-1?0:slowStart;
+  const startLoss=focusResistance(traveled,slowStart,.82);
+  const endLoss=focusResistance(distance,slowEnd,.82)-focusResistance(distance-traveled,slowEnd,.82);
+  const fullTravel=distance-focusResistance(distance,slowStart,.82)-focusResistance(distance,slowEnd,.82);
+  const phase=Math.max(0,Math.min(1,(traveled-startLoss-endLoss)/Math.max(1,fullTravel)));
   send({type:'glyph:scroll-camera',from:storySteps[segment].dataset.concept||null,to:storySteps[segment+1].dataset.concept||null,progress:phase});
  }
 
@@ -105,9 +155,10 @@ function markStory(index){
  const changed=activeStory!==index;activeStory=index;storySteps.forEach((step,i)=>step.classList.toggle('is-active',i===index));if(changed||!mobileCaption.childElementCount)syncMobileCaption();applyStory();
 }
 const storyObserver=new IntersectionObserver(entries=>{
- for(const entry of entries)entry.target.dataset.visibility=String(entry.isIntersecting?entry.intersectionRatio:0);
- const visible=storySteps.map((step,index)=>({index,ratio:Number(step.dataset.visibility||0)})).filter(item=>item.ratio>0).sort((a,b)=>b.ratio-a.ratio);
- if(visible.length)markStory(visible[0].index);
+ // Use fresh geometry rather than stale ratios from different observer updates.
+ const stops=storyFocusPositions();
+ const candidates=storySteps.map((step,index)=>{const box=step.getBoundingClientRect();return {index,visible:box.bottom>innerHeight*.12&&box.top<innerHeight*.82,distance:Math.abs(stops[index]-scrollY)}}).filter(item=>item.visible).sort((a,b)=>a.distance-b.distance);
+ if(candidates.length)markStory(candidates[0].index);
 },{rootMargin:'-12% 0px -18% 0px',threshold:[0,.15,.3,.5,.7,.9,1]});
 storySteps.forEach(step=>storyObserver.observe(step));markStory(0);
 guideToggle.addEventListener('click',()=>setGuided(!guidedEnabled));
@@ -156,7 +207,7 @@ document.getElementById('atlas-help-close').onclick=()=>document.getElementById(
 window.addEventListener('message',event=>{
  if(event.source!==frame.contentWindow||event.data?.type!=='glyph:search-results')return;
  atlasResults.replaceChildren();const matches=event.data.matches||[];
- for(const match of matches){const button=document.createElement('button');button.type='button';button.textContent=match.code+' · '+match.text;button.onclick=()=>{atlasSearch.value='';atlasResults.hidden=true;atlasSearch.setAttribute('aria-expanded','false');send({type:'glyph:search',query:''});send({type:'glyph:concept',concept:match.code})};atlasResults.appendChild(button)}
+ for(const match of matches){const button=document.createElement('button');button.type='button';button.textContent=match.code+(match.text?' · '+match.text:'');button.onclick=()=>{atlasSearch.value='';atlasResults.hidden=true;atlasSearch.setAttribute('aria-expanded','false');send({type:'glyph:search',query:''});send({type:'glyph:concept',concept:match.code})};atlasResults.appendChild(button)}
  if(!matches.length&&atlasSearch.value.trim())atlasResults.textContent='No matching concepts';
  atlasResults.hidden=!atlasSearch.value.trim();atlasSearch.setAttribute('aria-expanded',String(!atlasResults.hidden));
 });
