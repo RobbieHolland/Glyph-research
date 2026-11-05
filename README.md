@@ -25,7 +25,7 @@ Open <http://localhost:8000/>.
 
 ## Reproduce the association tables
 
-The private [Glyph research dataset](https://huggingface.co/datasets/RobbieHolland/Glyph-research) contains the frozen concept activations and versioned aggregate association results. After obtaining dataset access, run:
+The public [Glyph research dataset](https://huggingface.co/datasets/RobbieHolland/Glyph-research) contains the frozen concept activations and versioned aggregate association results. To download the release and reproduce the tables, run:
 
 ```bash
 ./reproduce.sh
@@ -58,4 +58,4 @@ missingness, and never replaces missing covariates with zero.
 
 ## Study-level data scope
 
-The cleaned HF files contain 51,331 non-Mayo studies. All 14,199 Mayo study rows have been removed from the three activation matrices, outcome labels and survival labels. Aggregate Mayo associations are retained; their underlying study-level data are not distributed. Earlier contaminated dataset history requires explicit permanent-history-removal approval.
+The cleaned HF files contain 51,331 non-Mayo studies. All 14,199 Mayo study rows have been removed from the three activation matrices, outcome labels and survival labels. Aggregate Mayo associations are retained; their underlying study-level data are not distributed. Superseded Mayo-containing study-level files have been removed from HF storage and their old download URLs are blocked. Historical commit metadata can remain visible.

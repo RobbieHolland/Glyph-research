@@ -1,14 +1,14 @@
 > Current study-level release excludes all Mayo studies. The reproduction readers
-> pin the clean revision. Old repository history remains pending explicitly
-> approved permanent removal. No Mayo refits are possible from the distributed
+> pin the clean revision. Superseded study-level objects have been removed from
+> HF storage; old commit metadata can remain visible. No Mayo refits are possible from the distributed
 > study-level files.
 
 # Paper-v34 association release
 
-The existing private HF dataset is `RobbieHolland/Glyph-research`. The release
+The public HF dataset is `RobbieHolland/Glyph-research`. The release
 is `fmr_orthogonal_paper_v34_20261104`; the exact published commit is pinned in
 `reproduce_tables.py`. Mayo study-level rows have been removed from every activation and label file.
-The latest dataset contains 51,331 non-Mayo studies; aggregate Mayo results remain. Old-history removal is pending explicit approval.
+The latest dataset contains 51,331 non-Mayo studies; aggregate Mayo results remain. The obsolete study-level objects are absent from the HF storage inventory and their old file downloads are blocked.
 
 ## Audit qualification
 
