@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Glyph concept explorer</title>
+<style>
+:root{--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--paper:#fff;--ground:#f8fafc;
+ --risk:#dc2626;--protective:#2563eb;--neutral:#e2e8f0}
+*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;background:var(--ground);color:var(--ink);
+ font:14px/1.45 ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow:hidden}
+#app{display:grid;grid-template-columns:minmax(0,1fr) 420px;height:100vh}
+#stage{position:relative;background:var(--paper);overflow:hidden}#graph{display:block;width:100%;height:100%;cursor:grab}
+#graph:active{cursor:grabbing}.edge{stroke:#94a3b8;vector-effect:non-scaling-stroke}
+.node{stroke:#64748b;stroke-opacity:.38;stroke-width:.35;vector-effect:non-scaling-stroke;pointer-events:none}.node-group{pointer-events:none;transform-box:fill-box;transform-origin:center;transition:transform .22s cubic-bezier(.2,.8,.2,1),opacity .18s ease;will-change:transform,opacity}.hit{cursor:pointer}
+#toolbar{position:absolute;z-index:5;display:flex;gap:7px;flex-wrap:wrap;top:12px;left:12px;right:12px}
+button,input,summary{font:inherit;font-size:12.5px;background:#fff;color:#40454d;border:1px solid var(--line);
+ border-radius:8px;padding:6px 9px}button{cursor:pointer}button[aria-pressed=true]{background:#0f172a;color:#fff}
+input{width:190px}details{position:relative}summary{cursor:pointer;list-style:none;min-width:150px}summary::-webkit-details-marker{display:none}
+.outcomes{position:absolute;top:36px;left:0;width:310px;max-height:380px;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px;box-shadow:0 12px 32px #0f172a1f}
+.picker-actions{display:flex;gap:6px;padding:2px 3px 7px}.picker-actions button{flex:1}
+.outcomes label{display:flex;gap:7px;align-items:flex-start;padding:5px;border-radius:5px;cursor:pointer}.outcomes label:hover{background:#f4f4f1}.outcomes input{width:auto;margin-top:3px}
+.legend{position:absolute;bottom:12px;left:12px;max-width:calc(100% - 24px);background:#fffffff0;border:1px solid var(--line);
+ border-radius:8px;padding:8px 11px;font-size:12px}.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin:0 5px 0 10px}.direction-key{display:inline-block;width:13px;height:13px;border-radius:50%;vertical-align:-2px;margin:0 4px 0 10px}.direction-key.risk{background:#475569}.direction-key.protective{background:repeating-linear-gradient(135deg,#fff 0 3px,#64748b 3px 5px);border:1px solid #94a3b8}
+#side{background:#fff;border-left:1px solid var(--line);overflow:auto;padding:20px}h1{font-size:17px;margin:0 0 3px}h2{font-size:15px;margin:18px 0 5px}
+.side-tabs{display:flex;gap:5px;margin:14px 0}.side-tabs button{flex:1}.side-tabs button.active{background:#0f172a;color:#fff}
+.rank-wrap{overflow:auto;max-height:calc(100vh - 155px);border:1px solid var(--line);border-radius:9px}.rank-table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;font-size:11px}
+.rank-table th,.rank-table td{padding:6px 8px;border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;white-space:nowrap;text-align:right}.rank-table th{position:sticky;top:0;z-index:2;cursor:pointer;color:#fff}.rank-table th.base{background:#334155;text-align:left}.rank-table td:first-child,.rank-table td:nth-child(2){text-align:left;position:sticky;background:#fff;z-index:1}.rank-table td:first-child{left:0;width:205px;max-width:205px;overflow:hidden;text-overflow:ellipsis}.rank-table td:nth-child(2){left:205px}.rank-table tr:hover td{background:#f1f5f9}.rank-cell{font-variant-numeric:tabular-nums}.stars{font-weight:800;letter-spacing:-1px}.rank-note{font-size:11px;color:var(--muted);margin:0 0 8px}
+.tech-controls{display:flex;align-items:center;gap:8px;margin:10px 0}.tech-controls select{font:inherit;border:1px solid var(--line);border-radius:7px;padding:5px 8px;background:#fff}.tech-table{border-collapse:collapse;width:100%;font-size:11.5px;margin:8px 0 18px}.tech-table th,.tech-table td{padding:6px 7px;border-bottom:1px solid var(--line);text-align:right}.tech-table th:first-child,.tech-table td:first-child,.tech-table th:nth-child(2),.tech-table td:nth-child(2){text-align:left}.tech-table th{background:#f8fafc;position:sticky;top:0}.metric-good{color:#047857;font-weight:700}.metric-bad{color:#b91c1c}.tech-scroll{max-height:calc(100vh - 260px);overflow:auto;border:1px solid var(--line);border-radius:9px}.tech-note{font-size:11px;color:var(--muted)}
+.ranking-open #app{grid-template-columns:minmax(320px,1fr) min(72vw,1100px)}
+.meta{font-size:12px;color:var(--muted)}p{color:#484d55}dl{display:grid;grid-template-columns:auto auto;gap:4px 12px;font-size:12.5px}
+.analysis-box{margin:12px 0;border:1px solid #dbeafe;border-radius:10px;background:#f8fbff;overflow:hidden}.analysis-box>summary{width:100%;min-width:0;border:0;border-radius:0;padding:9px 11px;background:#eff6ff;color:#1e3a8a;font-weight:750}.analysis-copy{padding:2px 11px 8px;font-size:12px}.analysis-copy p{margin:8px 0;color:#334155}
+dt{color:var(--muted)}dd{margin:0;text-align:right}.wheel{width:100%;height:auto;overflow:visible}.assoc{width:100%;border-collapse:collapse;font-size:12px}
+.assoc th,.assoc td{padding:5px 4px;border-bottom:1px solid #eee;text-align:right}.assoc th:first-child,.assoc td:first-child{text-align:left}
+#tip{position:fixed;z-index:20;pointer-events:none;opacity:0;background:#0f172a;color:#fff;max-width:330px;
+ border-radius:8px;padding:8px 10px;font-size:12px;box-shadow:0 7px 24px #0004}
+.tour-shade{position:fixed;inset:0;background:#0f172a99;backdrop-filter:blur(1px);z-index:30}.tour-card{position:fixed;z-index:32;width:min(360px,calc(100vw - 32px));background:#fff;border:1px solid #dbe3ee;border-radius:14px;padding:18px;box-shadow:0 20px 55px #0f172a40;transition:left .2s ease,top .2s ease}.tour-card h2{margin:2px 0 7px;font-size:17px}.tour-card p{margin:0 0 15px}.tour-kicker{color:#2563eb;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.tour-actions{display:flex;align-items:center;gap:7px}.tour-actions .tour-skip{margin-right:auto;border:0;color:var(--muted)}.tour-target{z-index:31!important;box-shadow:0 0 0 4px #fff,0 0 0 8px #60a5fa!important;border-radius:10px}.tour-dots{color:#94a3b8;font-size:11px}
+.simple-view #app{grid-template-columns:minmax(0,1fr) 420px}
+.simple-view #side{padding:28px 24px}.simple-view h1{font-size:20px;letter-spacing:-.03em}
+.simple-view #toolbar{gap:8px;top:20px;left:20px;right:20px}
+.simple-view #toolbar>input{flex:1;max-width:250px;min-width:130px}
+.simple-view #toolbar>button,.simple-view #toolbar>details>summary{padding:9px 12px;border-radius:10px;box-shadow:0 2px 6px #0f172a06}
+.simple-view #toolbar>input{padding:9px 12px;border-radius:10px;box-shadow:0 2px 6px #0f172a06}
+.simple-view .side-tabs,.simple-view #agenticAnalysis{display:none!important}
+.simple-view #intro{margin-top:30px;color:#64748b;line-height:1.8}
+.simple-view #detail h2{margin-top:24px}.simple-view .assoc{font-size:11.5px}
+.simple-view .legend{left:20px;bottom:20px;padding:10px 14px;border-radius:10px;line-height:1.8}
+.simple-view .outcomes{top:43px;padding:12px;border-radius:12px;box-shadow:0 12px 36px #0f172a12}
+.simple-view #displaySettings .outcomes .outcomes{position:static;width:auto;max-height:none;border:0;padding:8px 0;box-shadow:none}
+.simple-view #displaySettings .outcomes b{display:block;margin-top:8px;color:#334155}
+.simple-view #displaySettings .outcomes p{display:none}
+.hit:focus-visible{outline:none;stroke:#0f172a;stroke-width:2}
+@media(max-width:850px){#app,.simple-view #app{grid-template-columns:1fr;grid-template-rows:minmax(300px,55vh) minmax(0,1fr);height:100dvh}#side{display:block;border-left:0;border-top:1px solid var(--line)}.simple-view #side{padding:20px}.simple-view #toolbar{top:12px;left:12px;right:12px;gap:6px}.simple-view #toolbar>input{max-width:180px}.simple-view .legend{left:12px;bottom:12px;font-size:11px}.ranking-open #app{grid-template-columns:1fr}}
+
+.node-group.is-selected .node{stroke:#0f172a;stroke-opacity:1;stroke-width:2}
+#outcomeSearch{width:100%;margin:0 0 8px}.outcomes input[type=search]{width:100%}
+#mapStatus{position:absolute;top:76px;left:22px;font-size:12px;color:var(--muted);pointer-events:none}
+#emptyState{position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);max-width:310px;padding:20px;background:#fffffff0;border:1px solid var(--line);border-radius:12px;text-align:center;pointer-events:none}
+#emptyState b{display:block;margin-bottom:5px}#emptyState p{margin:0;color:var(--muted);font-size:12px}
+.detail-actions{display:flex;gap:8px;justify-content:space-between;margin-top:22px}.detail-actions button{font-size:11.5px}
+.wheel-spoke{cursor:help;outline:none}.wheel-spoke:hover,.wheel-spoke:focus-visible{fill:#0f172a;fill-opacity:.09;stroke:#475569;stroke-width:.8}
+.wheel-label{pointer-events:none}.assoc td{vertical-align:top}.assoc .ci{display:block;font-size:10px;color:var(--muted);white-space:nowrap}
+.assoc .outcome-link{padding:0;border:0;background:none;text-align:left;font-size:11.5px;color:inherit}.assoc .outcome-link:hover{text-decoration:underline}
+.p-value{font-variant-numeric:tabular-nums;white-space:nowrap}.assoc-note{font-size:11px;color:var(--muted);margin:8px 0}
+#tip dl{margin:7px 0 0;gap:2px 14px;font-size:11.5px}#tip dt{color:#cbd5e1}#tip dd{color:#fff}
+#filterReset{margin-top:9px;width:100%}#zoomControls{position:absolute;right:20px;bottom:20px;display:flex;gap:4px}#zoomControls button{font-size:18px;width:32px;height:32px;padding:0}
+#search:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid #64748b;outline-offset:2px}
+@media(max-width:850px){#toolbar details>.outcomes{position:fixed;left:12px;right:12px;top:110px;width:auto;max-height:calc(52dvh - 130px)}#mapStatus{top:110px;left:14px;font-size:11px}#side{min-height:0}.simple-view #side{padding:20px}.outcomes{max-width:calc(100vw - 28px)}.simple-view .legend{max-width:calc(100% - 70px);font-size:10px}.simple-view #toolbar>details>summary{min-width:105px}.simple-view #toolbar>input{max-width:none;flex-basis:135px}.simple-view #toolbar>button{padding:8px}#zoomControls{right:12px;bottom:12px;flex-direction:column}#mapStatus{max-width:calc(100% - 28px)}.simple-view #app{grid-template-rows:minmax(320px,52dvh) minmax(0,1fr)}}
+.concept-images{margin:20px 0}.example-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.example-grid figure{margin:0;min-width:0}.example-grid img{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:contain;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:10px}.example-grid img.pixelated{image-rendering:pixelated}.example-grid figcaption{margin-top:6px;font-size:10px;overflow-wrap:anywhere;color:#475569}.example-grid figcaption span{display:block;margin-top:3px;color:#64748b}
+</style></head><body><div id="app"><main id="stage">
+<div id="toolbar"><details id="outcomePicker"><summary id="outcomeSummary">Outcomes</summary><div class="outcomes"><div class="picker-actions"><button id="selectAllOutcomes" type="button">Select all</button><button id="clearOutcomes" type="button">Clear</button></div><input id="outcomeSearch" type="search" aria-label="Find an outcome" placeholder="Find an outcome"><div id="outcomeChoices"></div></div></details><details id="contextPicker"><summary id="contextSummary">Context: all</summary><div class="outcomes" id="contextChoices"></div></details><details id="facetPicker"><summary>Modalities / families</summary><div class="outcomes" id="facetChoices"></div></details><details id="colorSettings"><summary id="colorSummary">Color: outcomes</summary><div class="outcomes"><b>Node color</b><label><input type="radio" name="colorMode" value="outcome" checked><span>Outcome associations</span></label><label><input type="radio" name="colorMode" value="modality"><span>Modality</span></label><p class="meta">Outcome mode uses the selected significant associations. Modality mode shows where each data source lives.</p></div></details><details id="displaySettings"><summary id="settingsSummary">Both directions · extreme 10% · min 5</summary><div class="outcomes"><b>Association direction</b><label><input type="radio" name="associationDirection" value="risk"><span>Risk (OR &gt; 1)</span></label><label><input type="radio" name="associationDirection" value="protective"><span>Protective (OR &lt; 1)</span></label><label><input type="radio" name="associationDirection" value="both" checked><span>Both directions</span></label><label><input id="extremeOnly" type="checkbox" checked><span>Most extreme 10% per direction (minimum 5)</span></label><p class="meta">Risk uses the highest odds ratios; protective uses the lowest. Ranking is recalculated within each outcome and the currently visible context.</p></div></details><input id="search" type="search" aria-label="Search concepts" placeholder="Search concepts">
+<button id="reset">Reset view</button><button id="tourButton">Tour</button></div>
+<svg id="graph" role="group" aria-label="Interactive concept network"><g id="camera"><g id="edgeLayer"></g><g id="nodeLayer"></g></g></svg>
+<div id="mapStatus" role="status" aria-live="polite"></div><div id="emptyState" hidden><b>No matching concepts</b><p>Try another search or change the display options.</p></div><div class="legend" id="legend"></div><div id="zoomControls"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button></div>
+<div id="tip" role="tooltip"></div></main><aside id="side"><h1 id="mapTitle">Glyph</h1><div class="meta" id="mapMeta"></div><details class="analysis-box" id="agenticAnalysis" hidden><summary>Agentic analysis</summary><div class="analysis-copy" id="agenticAnalysisContent"></div><div class="analysis-copy"><a id="analysisReportLink" target="_blank" rel="noopener" hidden>Open evidence report ↗</a></div></details><div class="side-tabs"><button id="detailTab" class="active">Concept detail</button><button id="rankingTab">Significant associations</button><button id="technicalTab">Technical details</button></div>
+<section id="detailPanel"><p id="intro">Select a concept to inspect its interpretation and association profile. Scroll to zoom and drag to pan.</p><div id="detail"></div></section><section id="rankingPanel" hidden><p class="rank-note" id="rankNote">Globally significant associations. Stars use within-modality Bonferroni p: * &lt;.05, ** &lt;.01, *** &lt;.001. Click an outcome header to sort by odds ratio.</p><div class="rank-wrap"><table class="rank-table" id="rankTable"></table></div></section><section id="technicalPanel" hidden><p class="tech-note" id="technicalNote"></p><div class="tech-controls"><label for="technicalSplit"><b>Evaluation split</b></label><select id="technicalSplit"><option value="train">Train</option><option value="val">Validation</option><option value="test" selected>Test</option></select></div><div id="technicalContent"></div></section></aside></div>
+<div id="tourShade" class="tour-shade" hidden></div><div id="tourCard" class="tour-card" hidden><div class="tour-kicker" id="tourKicker"></div><h2 id="tourTitle"></h2><p id="tourText"></p><div class="tour-actions"><button class="tour-skip" id="tourSkip">Skip</button><span class="tour-dots" id="tourDots"></span><button id="tourBack">Back</button><button id="tourNext">Next</button></div></div>
+<script>
+const DATA=__GLYPH_DATA__,NS='http://www.w3.org/2000/svg',S=1000,BASE_NODE_OPACITY=.7;
+const isSimple=DATA.view!=='full';document.body.classList.toggle('simple-view',isSimple);
+document.title=DATA.title;document.getElementById('mapTitle').textContent=DATA.title;
+const svg=document.getElementById('graph'),camera=document.getElementById('camera'),edgeLayer=document.getElementById('edgeLayer'),nodeLayer=document.getElementById('nodeLayer'),tip=document.getElementById('tip');
+const patternDefs=document.createElementNS(NS,'defs');svg.prepend(patternDefs);const protectivePatterns=new Map();
+svg.setAttribute('viewBox',`0 0 ${S} ${S}`);document.getElementById('mapMeta').textContent=isSimple?`${DATA.nodes.length} concepts · ${DATA.outcomes.length} outcomes${DATA.split?' · '+DATA.split+' split · unadjusted associations':''}${DATA.selection_note?' · '+DATA.selection_note:''}`:`${DATA.modality} · ${DATA.top_k} · ${DATA.split} · ${DATA.nodes.length} displayed concepts · Bonferroni-adjusted p < ${(DATA.bonferroni_alpha??.05).toPrecision(3)}${DATA.selection_note?' · '+DATA.selection_note:''}`;
+const escapeHTML=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+if(DATA.agentic_analysis||DATA.analysis_report_url){const box=document.getElementById('agenticAnalysis'),content=document.getElementById('agenticAnalysisContent'),link=document.getElementById('analysisReportLink');box.hidden=false;if(DATA.agentic_analysis)content.innerHTML=String(DATA.agentic_analysis).split(/\n\s*\n/).filter(Boolean).map(p=>`<p>${escapeHTML(p).replace(/\n/g,'<br>')}</p>`).join('');if(DATA.analysis_report_url){link.href=DATA.analysis_report_url;link.hidden=false}}
+const A=DATA.associations;
+let selectedNode=null,onlySignificant=false;
+const formatP=p=>p==null?'—':p===0?'0 (reported)':p<.001?p.toExponential(2):p.toPrecision(3);
+const formatOR=v=>v==null?'—':v>=1000||v<.01?v.toExponential(2):v!==1&&Math.abs(v-1)<.005?v.toPrecision(6):v.toFixed(2);
+function moveTip(e){const r=e.target?.getBoundingClientRect?.();let x=e.clientX??(r?.right??20),y=e.clientY??(r?.top??20);if(e.type==='focusin'||e.type==='focus'){x=r?.right??20;y=r?.top??20}tip.style.opacity=1;tip.style.left=Math.max(8,Math.min(innerWidth-tip.offsetWidth-8,x+14))+'px';tip.style.top=Math.max(8,Math.min(innerHeight-tip.offsetHeight-8,y+14))+'px'}
+function associationTip(e,a){tip.innerHTML=`<b>${escapeHTML(a.outcome)}</b><div>${a.odds_ratio<1?'Lower':'Higher'} odds · ${a.significant?'Bonferroni-significant':'Not Bonferroni-significant'}</div><dl><dt>Odds ratio</dt><dd>${formatOR(a.odds_ratio)}</dd><dt>95% confidence interval</dt><dd>${a.ci_lower!=null&&a.ci_upper!=null?formatOR(a.ci_lower)+'–'+formatOR(a.ci_upper):'Not available'}</dd><dt>Raw p-value</dt><dd>${formatP(a.p_value)}</dd><dt>Bonferroni p-value</dt><dd>${formatP(a.corrected_p_value)}</dd>${a.count==null?'':`<dt>Reported support</dt><dd>${a.count.toLocaleString()}</dd>`}</dl>`;moveTip(e)}
+function renderEdges(){if(edgeLayer.childElementCount)return;const fragment=document.createDocumentFragment();DATA.edges.forEach(([a,b,w])=>{const x=document.createElementNS(NS,'line');x.classList.add('edge');x.dataset.a=a;x.dataset.b=b;x.setAttribute('x1',DATA.nodes[a].x*S);x.setAttribute('y1',DATA.nodes[a].y*S);x.setAttribute('x2',DATA.nodes[b].x*S);x.setAttribute('y2',DATA.nodes[b].y*S);x.setAttribute('stroke-width',.30*Math.abs(w));x.setAttribute('stroke-opacity',.14*Math.abs(w));fragment.appendChild(x)});edgeLayer.appendChild(fragment)}renderEdges();
+let activeContext=null;
+const contextValues=n=>activeContext?n.contexts?.[activeContext]:null;
+const nodeRate=n=>contextValues(n)?.rate??n.rate,nodeActive=n=>contextValues(n)?.active??n.active;
+const contextPasses=n=>!activeContext||nodeActive(n)>=(DATA.context_min_activations??20);
+const NODE_SIZING=DATA.node_sizing;
+const radius=n=>Math.sqrt(Math.max(NODE_SIZING.minimum_area,NODE_SIZING.full_prevalence_area*Math.max(0,Math.min(100,nodeRate(n)))/100)/Math.PI);
+DATA.nodes.forEach(n=>{const g=document.createElementNS(NS,'g');g.classList.add('node-group');g.style.opacity=BASE_NODE_OPACITY;n.el=g;nodeLayer.appendChild(g);
+ const h=document.createElementNS(NS,'circle');n.hit=h;h.classList.add('hit');h.setAttribute('cx',n.x*S);h.setAttribute('cy',n.y*S);h.setAttribute('r',Math.max(9,radius(n)+3));h.setAttribute('fill','transparent');h.setAttribute('tabindex','0');h.setAttribute('role','button');h.setAttribute('aria-label',n.name);h.dataset.node=n.i;h.onclick=e=>{e.stopPropagation();if(moved<4&&nodePassesFilter(n))show(n)};h.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();show(n)}};
+ h.onmousemove=e=>showTip(e,n);h.onmouseleave=()=>tip.style.opacity=0;nodeLayer.appendChild(h)});
+const selected=new Set(DATA.initial_outcome==null?[]:[DATA.initial_outcome]),choices=document.getElementById('outcomeChoices'),summary=document.getElementById('outcomeSummary');
+const DISEASE_PALETTE=['#14B8A6','#3B82F6','#8B5CF6','#EC4899','#6366F1','#06B6D4','#10B981','#A855F7','#0EA5E9'];
+const MODALITY_PALETTE=['#1E3A5F','#514B8A','#246B67','#475569','#075985','#374151'];
+const outcomeColor=o=>DATA.outcome_colors?.[o]||DISEASE_PALETTE[DATA.outcomes.indexOf(o)%DISEASE_PALETTE.length];
+const modalityColor=m=>MODALITY_PALETTE[(DATA.modalities||[]).indexOf(m)%MODALITY_PALETTE.length];
+let colorMode='outcome';
+function addOutcomeChoice(o){const label=document.createElement('label'),box=document.createElement('input'),swatch=document.createElement('i'),text=document.createElement('span');box.type='checkbox';box.value=o;box.checked=selected.has(o);swatch.className='dot';swatch.style.background=outcomeColor(o);swatch.style.margin='3px 0 0 0';text.textContent=o;label.append(box,swatch,text);choices.appendChild(label);box.onchange=()=>{box.checked?selected.add(o):selected.delete(o);updateSummary();recolor();applyFilters()}}
+const groupedOutcomes=new Set();Object.entries(DATA.outcome_groups||{}).forEach(([group,outcomes])=>{const head=document.createElement('b');head.textContent=group;head.style.display='block';head.style.padding='9px 5px 3px';choices.appendChild(head);outcomes.forEach(o=>{groupedOutcomes.add(o);addOutcomeChoice(o)})});DATA.outcomes.filter(o=>!groupedOutcomes.has(o)).forEach(addOutcomeChoice);
+function syncOutcomeBoxes(){choices.querySelectorAll('input').forEach(box=>box.checked=selected.has(box.value));updateSummary();recolor();applyFilters()}
+document.getElementById('selectAllOutcomes').onclick=e=>{e.preventDefault();DATA.outcomes.forEach(o=>selected.add(o));syncOutcomeBoxes()};
+document.getElementById('clearOutcomes').onclick=e=>{e.preventDefault();selected.clear();syncOutcomeBoxes()};
+function updateSummary(){if(!DATA.outcomes.length){summary.textContent="No outcome labels";return}summary.textContent=selected.size===1?[...selected][0].replace(/\s*\([^)]*\)$/,''):selected.size?'Selected diseases':'Choose a disease'}
+document.getElementById('outcomeSearch').oninput=e=>{const q=e.target.value.trim().toLowerCase();choices.querySelectorAll('label').forEach(row=>row.hidden=!row.textContent.toLowerCase().includes(q))};
+const contextPicker=document.getElementById('contextPicker'),contextChoices=document.getElementById('contextChoices'),contextSummary=document.getElementById('contextSummary');
+function addContextChoice(label,value){const row=document.createElement('label'),radio=document.createElement('input'),text=document.createElement('span');radio.type='radio';radio.name='baselineContext';radio.checked=value===null;text.textContent=label;row.append(radio,text);contextChoices.appendChild(row);radio.onchange=()=>{if(!radio.checked)return;activeContext=value;contextSummary.textContent=value?`Context: ${value}`:'Context: all';updateAssociationMode()}}
+if(DATA.contexts?.length){addContextChoice('All contexts',null);DATA.contexts.forEach(name=>addContextChoice(name,name))}else contextPicker.hidden=true;
+const color=a=>!a||!a.significant?'#a8adb5':a.odds_ratio>=1?'#c73b3b':'#3478bd';
+const selectedHits=n=>(A[n.i]||[]).filter(a=>selected.has(a.outcome)&&associationPasses(a,n));
+function circle(cx,cy,r,fill,cls=''){const x=document.createElementNS(NS,'circle');x.setAttribute('cx',cx);x.setAttribute('cy',cy);x.setAttribute('r',r);x.setAttribute('fill',fill);if(cls)x.setAttribute('class',cls);return x}
+function wedge(cx,cy,r,a0,a1,fill){const p=t=>[cx+r*Math.cos(t),cy+r*Math.sin(t)],s=p(a0),e=p(a1),x=document.createElementNS(NS,'path');x.setAttribute('d',`M${cx},${cy}L${s[0]},${s[1]}A${r},${r} 0 ${a1-a0>Math.PI?1:0} 1 ${e[0]},${e[1]}Z`);x.setAttribute('fill',fill);return x}
+function protectiveFill(outcome){if(protectivePatterns.has(outcome))return`url(#${protectivePatterns.get(outcome)})`;const id=`protective-${protectivePatterns.size}`,pattern=document.createElementNS(NS,'pattern'),base=document.createElementNS(NS,'rect'),stripe=document.createElementNS(NS,'path'),hue=outcomeColor(outcome);pattern.id=id;pattern.setAttribute('patternUnits','userSpaceOnUse');pattern.setAttribute('width',7);pattern.setAttribute('height',7);base.setAttribute('width',7);base.setAttribute('height',7);base.setAttribute('fill',hue);base.setAttribute('fill-opacity','.18');stripe.setAttribute('d','M-2,7 L7,-2 M2,9 L9,2');stripe.setAttribute('stroke',hue);stripe.setAttribute('stroke-width','2');pattern.append(base,stripe);patternDefs.appendChild(pattern);protectivePatterns.set(outcome,id);return`url(#${id})`}
+// Each outcome uses its own strongest significant effect under the display filters.
+const associationShadeLimits=new Map();
+function associationStrengthLimit(outcome){
+ if(!associationShadeLimits.has(outcome)){
+  let maximum=0;
+  DATA.nodes.forEach(n=>{
+   if(!contextPasses(n)||!selectedModalities.has(n.modality)||!selectedFamilies.has(n.embedding_family))return;
+   const a=significantByNode[n.i][outcome];
+   if(associationPasses(a,n))maximum=Math.max(maximum,Math.abs(Math.log(a.odds_ratio)));
+  });
+  associationShadeLimits.set(outcome,maximum);
+ }
+ return associationShadeLimits.get(outcome);
+}
+function associationStrengthColor(a){
+ const maximum=associationStrengthLimit(a.outcome);
+ const strength=maximum?Math.min(1,Math.abs(Math.log(a.odds_ratio))/maximum):0;
+ const hue=outcomeColor(a.outcome).replace('#','');
+ const channels=[0,2,4].map(i=>Math.round(255*(1-strength)+parseInt(hue.slice(i,i+2),16)*.75*strength));
+ return '#'+channels.map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+function shadedProtectiveFill(a){
+ const shade=associationStrengthColor(a),key=a.outcome+':'+shade;
+ if(protectivePatterns.has(key))return `url(#${protectivePatterns.get(key)})`;
+ const id=`protective-${protectivePatterns.size}`,pattern=document.createElementNS(NS,'pattern');
+ pattern.id=id;pattern.setAttribute('patternUnits','userSpaceOnUse');
+ pattern.setAttribute('width',7);pattern.setAttribute('height',7);
+ const base=document.createElementNS(NS,'rect');base.setAttribute('width',7);base.setAttribute('height',7);base.setAttribute('fill',shade);
+ const stripe=document.createElementNS(NS,'path');stripe.setAttribute('d','M-2,7 L7,-2 M2,9 L9,2');stripe.setAttribute('stroke','#fff');stripe.setAttribute('stroke-opacity','.65');stripe.setAttribute('stroke-width',2);
+ pattern.append(base,stripe);patternDefs.appendChild(pattern);protectivePatterns.set(key,id);
+ return `url(#${id})`;
+}
+const associationFill=a=>a.odds_ratio<1?shadedProtectiveFill(a):associationStrengthColor(a);
+function ringWedge(cx,cy,r0,r1,a0,a1,fill){const p=(r,t)=>[cx+r*Math.cos(t),cy+r*Math.sin(t)],a=p(r1,a0),b=p(r1,a1),c=p(r0,a1),d=p(r0,a0),x=document.createElementNS(NS,'path');x.setAttribute('d',`M${a}A${r1},${r1} 0 ${a1-a0>Math.PI?1:0} 1 ${b}L${c}A${r0},${r0} 0 ${a1-a0>Math.PI?1:0} 0 ${d}Z`);x.setAttribute('fill',fill);return x}
+function drawNode(n){const hits=selectedHits(n),cx=n.x*S,cy=n.y*S,r=radius(n);n.el.replaceChildren();n.hit.setAttribute('r',Math.max(9,r+3));if(colorMode==='modality')n.el.appendChild(circle(cx,cy,r,modalityColor(n.modality)));else if(!hits.length)n.el.appendChild(circle(cx,cy,r,'#E2E8F0'));else if(hits.length===1)n.el.appendChild(circle(cx,cy,r,associationFill(hits[0])));else hits.forEach((a,i)=>n.el.appendChild(wedge(cx,cy,r,-Math.PI/2+i*2*Math.PI/hits.length,-Math.PI/2+(i+1)*2*Math.PI/hits.length,associationFill(a))));n.outline=circle(cx,cy,r,'none','node');n.el.appendChild(n.outline)}
+function updateLegend(){const legend=document.getElementById('legend'),contextLabel=activeContext?` · ${escapeHTML(activeContext)} concepts (≥${DATA.context_min_activations??20} active)`:DATA.contexts?.length?' · all contexts':'',directionLabel=associationDirection==='risk'?'risk OR > 1':associationDirection==='protective'?'protective OR < 1':'risk + protective',modeLabel=extremeOnly?`extreme 10% ${directionLabel} (min 5)`:directionLabel;if(colorMode==='modality'){legend.innerHTML='<b>Color: modality'+contextLabel+'</b><br>Node area: activation prevalence<br>'+(DATA.modalities||[]).map(m=>`<span class="dot" style="background:${modalityColor(m)}"></span>${escapeHTML(m)}`).join('');return}const shown=[...selected].slice(0,selected.size<=12?12:8),extra=Math.max(0,selected.size-shown.length);legend.innerHTML=`<b>Color: outcome · ${modeLabel}${contextLabel}</b><span class="direction-key risk"></span>▲ predictive <span class="direction-key protective"></span>▼ protective<br>`+shown.map(o=>`<span class="dot" style="background:${outcomeColor(o)}"></span>${escapeHTML(o)}`).join('')+(extra?` &nbsp;+${extra} more`:'')+'<span class="dot" style="background:#E2E8F0"></span>none<br>Node area: activation prevalence'}
+function recolor(){associationShadeLimits.clear();DATA.nodes.forEach(drawNode);updateLegend()}
+function showTip(e,n){tip.textContent=n.interpretation||'No interpretation available';moveTip(e)}
+function wheel(n){
+ const items=A[n.i]||[];
+ if(DATA.progressive_associations&&!n.associations_ready)return '<p class="meta association-pending">Loading association data…</p>';
+ if(!items.length)return '<p class="meta">No outcome estimates are available for this concept.</p>';
+ // Same family order, 0.15-radian gaps and square-root risk geometry as the paper wheels.
+ const groups=[['Cardiovascular','Cardiac'],['Neuro/cognitive','Neuro'],['Renal/urinary','Renal'],['Metabolic/nutritional','Metabolic'],['Hepatic/biliary','Hepatic'],['Respiratory','Resp'],['Infection/sepsis','Infection'],['Oncologic','Onc'],['Haematologic','Haem'],['Musculoskeletal/trauma','MSK'],['Other','Other']].filter(([name])=>DATA.outcome_groups[name]?.length);
+ const angles=new Map(),arcs=[],gap=.15,total=groups.reduce((s,[name])=>s+DATA.outcome_groups[name].length,0),span=2*Math.PI-gap*groups.length,bw=span/total*.8;
+ let current=Math.PI/2;
+ groups.forEach(([name,label])=>{
+  const outcomes=DATA.outcome_groups[name].slice().sort((a,b)=>a<b?-1:a>b?1:0),width=span*outcomes.length/total;
+  outcomes.forEach((outcome,k)=>angles.set(outcome,current-width*(k+.5)/outcomes.length));
+  arcs.push({name,label,start:current,end:current-width,outcomes});current-=width+gap;
+ });
+ const D=440,c=D/2,top=Math.max(1,...items.map(a=>a.odds_ratio));
+ const rf=o=>Math.sqrt(Math.max(o,1)-1),radialSpan=rf(top)||1,hole=radialSpan*.34,rim=hole+radialSpan,K=(D/2-58)/rim;
+ const point=(r,a)=>[c+r*K*Math.sin(a),c-r*K*Math.cos(a)];
+ const sector=(r0,r1,a0,a1)=>{const p=point(r0,a0),q=point(r1,a0),s=point(r1,a1),t=point(r0,a1);return `M${p}L${q}A${r1*K},${r1*K} 0 0 0 ${s}L${t}A${r0*K},${r0*K} 0 0 1 ${p}Z`};
+ let grid='';
+ [1.1,1.25,1.5,1.75,2,2.5,3,3.5,4].filter(v=>v<top&&rf(v)>radialSpan*.2).forEach(v=>{
+  grid+=`<circle class="wheel-reference" data-or="${v}" cx="${c}" cy="${c}" r="${(hole+rf(v))*K}" fill="none" stroke="#eae9e5" stroke-width="1"/>`;
+ });
+ grid+=`<circle class="wheel-reference" data-or="${top}" cx="${c}" cy="${c}" r="${rim*K}" fill="none" stroke="#dcdbd6" stroke-width="1.1"/>`;
+ let effects='',targets='';
+ items.forEach((a,i)=>{
+  const angle=angles.get(a.outcome);if(angle==null)return;
+  const end=hole+rf(a.odds_ratio),a0=angle-bw/2,a1=angle+bw/2;
+  if(end>hole)effects+=`<path class="wheel-effect" data-or="${a.odds_ratio}" data-start-radius="${hole*K}" data-end-radius="${end*K}" d="${sector(hole,end,a0,a1)}" fill="${outcomeColor(a.outcome)}" fill-opacity="${a.significant?.97:.17}" pointer-events="none"/>`;
+  targets+=`<path class="wheel-spoke" data-association="${i}" data-outcome="${escapeHTML(a.outcome)}" d="${sector(hole,rim,a0,a1)}" fill="transparent" tabindex="0" role="button" aria-describedby="tip" aria-label="${escapeHTML(a.outcome)}: OR ${formatOR(a.odds_ratio)}, ${a.significant?'significant':'not significant'}"><title>${escapeHTML(a.outcome)} · OR ${formatOR(a.odds_ratio)} · Bonferroni p ${formatP(a.corrected_p_value)}</title></path>`;
+ });
+ let labels='';
+ arcs.forEach(({name,label,start,end,outcomes})=>{
+  const largest=Math.max(0,...items.filter(a=>outcomes.includes(a.outcome)).map(a=>rf(a.odds_ratio)));
+  const radius=hole+Math.max(largest,radialSpan*.16)+radialSpan*.095;
+  const [x,y]=point(radius,(start+end)/2),hue=outcomeColor(outcomes[0]);
+  labels+=`<text class="wheel-family-label" x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" font-size="13" font-weight="650" fill="${hue}" style="paint-order:stroke;stroke:#fff;stroke-width:5px;stroke-linejoin:round"><title>${escapeHTML(name)}</title>${label}</text>`;
+ });
+ const [tx,ty]=point(rim,Math.PI/4);
+ const center=`<circle class="wheel-reference" data-or="1" cx="${c}" cy="${c}" r="${hole*K}" fill="#fff" stroke="#cfcec9" stroke-width="1.6"/><text x="${c}" y="${c}" text-anchor="middle" dominant-baseline="central" font-size="${n.modality==='Clinical variables'?18:25}" font-weight="700" fill="${modalityColor(n.modality)}">${escapeHTML(n.wheel_label||n.name)}</text>`;
+ const rimLabel=`<text x="${tx+4}" y="${ty-5}" font-size="11" fill="#8a8a85" style="paint-order:stroke;stroke:#fff;stroke-width:4px">OR ${formatOR(top)}</text>`;
+ const significant=items.filter(a=>a.significant&&a.odds_ratio>1).length;
+ return `<div class="wheel-count">${significant} of ${DATA.outcomes.length} outcomes with significantly higher odds</div><svg class="wheel" viewBox="0 0 ${D} ${D}" data-scale="sqrt-or-minus-one" role="group" aria-label="Association wheel for ${escapeHTML(n.name)}">${grid}${effects}<g pointer-events="none">${center}${labels}${rimLabel}</g>${targets}</svg>`;
+}
+function selectOutcome(outcome){selected.clear();selected.add(outcome);syncOutcomeBoxes()}
+function conceptImages(n){
+ const refs=(DATA.concept_images||{})[String(n.concept_id??n.feature_idx)]||(DATA.concept_images||{})[String(n.feature_idx)]||[];
+ if(!refs.length)return '';
+ const cards=refs.map(([key,activation])=>{const image=(DATA.image_bank||{})[key];if(!image)return '';return `<figure><img src="${escapeHTML(image.src)}" alt="High-activation example ${escapeHTML(image.sample_id)}" loading="lazy" class="${image.pixelated?'pixelated':''}" width="${image.width}" height="${image.height}"><figcaption>${escapeHTML(image.sample_id)}<span>${escapeHTML(image.split)} · activation ${Number(activation).toPrecision(3)}</span></figcaption></figure>`}).join('');
+ return `<section class="concept-images"><h2>High-activation examples</h2><div class="example-grid">${cards}</div></section>`;
+}
+function renderSelected(){
+ const detail=document.getElementById('detail'),intro=document.getElementById('intro');
+ if(!selectedNode){detail.replaceChildren();intro.style.display='';return}
+ const n=selectedNode,items=(A[n.i]||[]).slice().sort((a,b)=>Math.abs(Math.log(b.odds_ratio))-Math.abs(Math.log(a.odds_ratio)));
+ const rows=items.map(a=>`<tr><td><button class="outcome-link" data-outcome="${escapeHTML(a.outcome)}">${escapeHTML(a.outcome)}</button></td><td>${a.odds_ratio<1?'▼':'▲'} ${formatOR(a.odds_ratio)}${a.ci_lower!=null&&a.ci_upper!=null?`<span class="ci">${formatOR(a.ci_lower)}–${formatOR(a.ci_upper)}</span>`:''}</td><td class="p-value">${formatP(a.corrected_p_value)}</td></tr>`).join('');
+ const activation=n.modality==='Clinical variables'?`Clinical variable · OR per Discovery SD`:activeContext?`${nodeActive(n).toLocaleString()} active in ${escapeHTML(activeContext)} · ${nodeRate(n)}%`:`${n.active.toLocaleString()} active samples · ${Number(n.rate).toFixed(1)}%`;
+ const family=n.embedding_family&&n.embedding_family!=='default'?` · ${escapeHTML(n.embedding_family)}`:'';
+ intro.style.display='none';detail.innerHTML=`<div class="detail-actions"><button id="clearSelection">← Back to map</button><button id="exportConcept">Export CSV</button></div><div class="concept-heading"><h2 class="concept-code" style="color:${modalityColor(n.modality)}">${escapeHTML(n.wheel_label||n.name)}</h2><p class="concept-interpretation">${escapeHTML(n.interpretation||'No interpretation available.')}</p></div><div class="meta concept-modality">${escapeHTML(n.modality)}${family} · Discovery cohort</div><details class="concept-statistics"><summary>Statistics</summary><div class="meta">${escapeHTML(n.modality)}${family} · ${activation}${n.accuracy==null?'':` · interpretation accuracy ${n.accuracy}%`}</div></details>${conceptImages(n)}<h2>Association wheel</h2><div class="meta">Unadjusted odds ratios · solid: significant · pale: nonsignificant. Spokes show higher odds, using the paper’s square-root scale. Hover for values; lower-odds estimates are available on hover and in the table.</div>${wheel(n)}<p class="assoc-note wheel-window">First recorded onset 1–4 years after the CT scan.</p><h2>Outcome associations</h2><p class="assoc-note">Sorted by effect magnitude. Intervals, where available, are 95% CIs. Click an outcome to highlight it on the map.</p><table class="assoc"><thead><tr><th>Outcome</th><th>OR / 95% CI</th><th>Bonferroni p</th></tr></thead><tbody>${rows}</tbody></table>`;
+ if(!DATA.outcomes.length){
+ const wheelHeader=[...detail.querySelectorAll('h2')].find(x=>x.textContent==='Association wheel');
+ while(wheelHeader?.nextSibling)wheelHeader.nextSibling.remove();
+ if(wheelHeader){wheelHeader.textContent='Concept exploration';wheelHeader.insertAdjacentHTML('afterend','<p>No association testing has been performed. Add outcome labels to test associations.</p>')}
+ }
+ detail.querySelector('#clearSelection').onclick=clearSelection;
+ detail.querySelector('#exportConcept').onclick=()=>exportConcept(n);
+ detail.querySelectorAll('.outcome-link').forEach(button=>button.onclick=()=>selectOutcome(button.dataset.outcome));
+ detail.querySelectorAll('.wheel-spoke').forEach(spoke=>{const a=A[n.i][Number(spoke.dataset.association)];spoke.onpointermove=e=>associationTip(e,a);spoke.onpointerleave=()=>tip.style.opacity=0;spoke.onfocus=e=>associationTip(e,a);spoke.onblur=()=>tip.style.opacity=0;spoke.onclick=()=>selectOutcome(a.outcome);spoke.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selectOutcome(a.outcome)}}});
+}
+function exportConcept(n){const columns=['concept','outcome','odds_ratio','ci_lower','ci_upper','p_value','corrected_p_value','significant','count'],quote=v=>'"'+String(v??'').replaceAll('"','""')+'"',rows=(A[n.i]||[]).map(a=>columns.map(c=>quote(c==='concept'?n.concept_id??n.feature_idx:a[c])).join(','));const blob=new Blob(['\uFEFF'+columns.join(',')+'\r\n'+rows.join('\r\n')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='glyph-concept-'+String(n.feature_idx)+'.csv';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+function show(n){tip.style.opacity=0;selectedNode=n;setSideTab('detail');applyFilters()}
+function clearSelection(){selectedNode=null;tip.style.opacity=0;applyFilters()}
+
+const detailTab=document.getElementById('detailTab'),rankingTab=document.getElementById('rankingTab'),technicalTab=document.getElementById('technicalTab'),detailPanel=document.getElementById('detailPanel'),rankingPanel=document.getElementById('rankingPanel'),technicalPanel=document.getElementById('technicalPanel');
+function setSideTab(tab){const ranking=tab==='ranking',technical=tab==='technical';detailPanel.hidden=ranking||technical;rankingPanel.hidden=!ranking;technicalPanel.hidden=!technical;detailTab.classList.toggle('active',!ranking&&!technical);rankingTab.classList.toggle('active',ranking);technicalTab.classList.toggle('active',technical);document.body.classList.toggle('ranking-open',ranking||technical)}
+detailTab.onclick=()=>setSideTab('detail');rankingTab.onclick=()=>setSideTab('ranking');technicalTab.onclick=()=>setSideTab('technical');
+const fmtMetric=v=>v==null||!Number.isFinite(Number(v))?'—':Number(v).toFixed(3);
+function renderTechnicalDetails(){const tech=DATA.technical_details;if(isSimple||!tech){technicalTab.hidden=true;return}technicalTab.hidden=false;document.getElementById('technicalNote').textContent=tech.method_note||'';const split=document.getElementById('technicalSplit').value,rows=tech.rows||[];const summary=rows.map(r=>`<tr><td>${escapeHTML(r.modality)}</td><td>${Number(r.input_dim).toLocaleString()}</td><td>${Number(r.n_alive).toLocaleString()} / ${Number(r.dict_size).toLocaleString()}</td><td>${r.top_k}</td><td>${Number(r.sample_counts?.[split]||0).toLocaleString()}</td><td>${fmtMetric(r.reconstruction_r2?.[split])}</td></tr>`).join('');const aucRows=rows.flatMap(r=>(r.aucs||[]).map(a=>{const raw=a.embedding?.[split],sae=a.sae?.[split],delta=raw==null||sae==null?null:sae-raw,cls=delta==null?'':delta>=0?'metric-good':'metric-bad';return`<tr><td>${escapeHTML(r.modality)}</td><td>${escapeHTML(a.outcome)}</td><td>${fmtMetric(raw)}</td><td>${fmtMetric(sae)}</td><td class="${cls}">${delta==null?'—':(delta>=0?'+':'')+delta.toFixed(3)}</td></tr>`})).join('');document.getElementById('technicalContent').innerHTML=`<h2>SAE diagnostics</h2><table class="tech-table"><thead><tr><th>Modality</th><th>Input dim</th><th>Alive / dictionary</th><th>Top-k</th><th>Samples</th><th>Reconstruction R²</th></tr></thead><tbody>${summary}</tbody></table><h2>Linear-probe AUROC · ${escapeHTML(split)}</h2><div class="tech-scroll"><table class="tech-table"><thead><tr><th>Modality</th><th>Outcome</th><th>Embedding</th><th>SAE</th><th>Δ SAE−embedding</th></tr></thead><tbody>${aucRows}</tbody></table></div>`}
+document.getElementById('technicalSplit').onchange=renderTechnicalDetails;renderTechnicalDetails();
+const stars=p=>p==null?'':p<.001?'***':p<.01?'**':p<.05?'*':'';
+const significantByNode=DATA.nodes.map(n=>{const by={};(A[n.i]||[]).filter(a=>a.significant).forEach(a=>by[a.outcome]=a);return by});
+const rankedNodes=DATA.nodes.filter(n=>Object.keys(significantByNode[n.i]).length);
+const selectedModalities=new Set(DATA.modalities||[]),selectedFamilies=new Set(DATA.embedding_families||[]),facetChoices=document.getElementById('facetChoices');
+let associationDirection='both',extremeOnly=!isSimple,extremeThresholds={};
+document.getElementById('extremeOnly').checked=extremeOnly;
+function recomputeExtremeThresholds(){extremeThresholds={};DATA.outcomes.forEach(outcome=>{const risk=[],protective=[];DATA.nodes.forEach(n=>{if(!contextPasses(n)||!selectedModalities.has(n.modality)||!selectedFamilies.has(n.embedding_family))return;const a=significantByNode[n.i][outcome];if(!a)return;if(a.odds_ratio>1)risk.push(a.odds_ratio);else if(a.odds_ratio<1)protective.push(a.odds_ratio)});risk.sort((a,b)=>a-b);protective.sort((a,b)=>a-b);const riskKeep=Math.min(risk.length,Math.max(5,Math.ceil(risk.length*.1))),protectiveKeep=Math.min(protective.length,Math.max(5,Math.ceil(protective.length*.1)));extremeThresholds[outcome]={risk:risk.length?risk[risk.length-riskKeep]:Infinity,protective:protective.length?protective[protectiveKeep-1]:-Infinity}})}
+function associationPasses(a,n){if(!a||!a.significant)return false;const risk=a.odds_ratio>1,protective=a.odds_ratio<1;if(associationDirection==='risk'&&!risk)return false;if(associationDirection==='protective'&&!protective)return false;if(!risk&&!protective)return false;if(!extremeOnly)return true;const threshold=extremeThresholds[a.outcome]||{risk:Infinity,protective:-Infinity};return(risk&&a.odds_ratio>=threshold.risk)||(protective&&a.odds_ratio<=threshold.protective)}
+function displayedAssociations(n){const shown={};Object.entries(significantByNode[n.i]).forEach(([outcome,a])=>{if(associationPasses(a,n))shown[outcome]=a});return shown}
+function updateAssociationMode(){recomputeExtremeThresholds();const direction=associationDirection==='risk'?'risk · OR > 1':associationDirection==='protective'?'protective · OR < 1':'risk + protective',summary=extremeOnly?`Extreme 10% ${direction} · min 5`:direction;document.getElementById('settingsSummary').textContent=isSimple?'Options':summary;const tail=associationDirection==='risk'?'highest odds ratios':associationDirection==='protective'?'lowest odds ratios':'highest and lowest odds ratios',prefix=extremeOnly?`Most extreme 10% (minimum five) of globally significant associations per direction: ${tail}. `:`All globally significant ${direction} associations. `;document.getElementById('rankNote').textContent=prefix+'Stars use within-modality Bonferroni p: * <.05, ** <.01, *** <.001. Click an outcome header to sort by odds ratio.';recolor();renderRankings();applyFilters()}
+function spotlight(n){edgeLayer.querySelectorAll('.edge').forEach(edge=>{edge.style.strokeOpacity=Number(edge.dataset.a)===n.i||Number(edge.dataset.b)===n.i?'.85':'.025'});DATA.nodes.forEach(m=>{m.el.style.opacity=m===n?1:.08;m.el.style.transform=m===n?'scale(2.15)':'scale(1)'});nodeLayer.appendChild(n.el)}
+function clearSpotlight(){edgeLayer.querySelectorAll('.edge').forEach(edge=>edge.style.strokeOpacity='');DATA.nodes.forEach(n=>{n.el.style.transform='scale(1)'});applyFilters()}
+let hoverOutcome=null,hoverOutcomeAdded=false;
+function highlightOutcome(outcome){if(hoverOutcome)return;hoverOutcome=outcome;hoverOutcomeAdded=!selected.has(outcome);if(hoverOutcomeAdded)selected.add(outcome);DATA.nodes.forEach(drawNode);const visible=n=>contextPasses(n)&&selectedModalities.has(n.modality)&&selectedFamilies.has(n.embedding_family),isHit=n=>visible(n)&&associationPasses(significantByNode[n.i][outcome],n),hits=DATA.nodes.filter(isHit);DATA.nodes.forEach(n=>{const hit=isHit(n);n.el.style.opacity=hit?1:.045;n.el.style.transform=hit?'scale(1.38)':'scale(1)';n.el.style.filter=hit?`drop-shadow(0 0 4px ${outcomeColor(outcome)})`:''});hits.forEach(n=>nodeLayer.appendChild(n.el))}
+function clearOutcomeHighlight(){if(!hoverOutcome)return;if(hoverOutcomeAdded)selected.delete(hoverOutcome);hoverOutcome=null;hoverOutcomeAdded=false;DATA.nodes.forEach(n=>{n.el.style.filter='';n.el.style.transform='scale(1)'});recolor();applyFilters()}
+let activeRankSort=null;
+function renderRankings(sortOutcome=activeRankSort){if(isSimple)return;activeRankSort=sortOutcome;clearOutcomeHighlight();const score=n=>{const by=displayedAssociations(n),values=sortOutcome?(by[sortOutcome]?[by[sortOutcome]]:[]):Object.values(by);if(!values.length)return associationDirection==='protective'?Infinity:-Infinity;if(associationDirection==='protective')return Math.min(...values.map(a=>a.odds_ratio));if(associationDirection==='both')return Math.max(...values.map(a=>Math.abs(Math.log(a.odds_ratio))));return Math.max(...values.map(a=>a.odds_ratio))},compare=(a,b)=>associationDirection==='protective'?score(a)-score(b):score(b)-score(a);const rows=rankedNodes.filter(n=>contextPasses(n)&&selectedModalities.has(n.modality)&&selectedFamilies.has(n.embedding_family)&&Object.keys(displayedAssociations(n)).length).sort(compare);const headers=DATA.outcomes.map(o=>`<th data-outcome="${escapeHTML(o)}" style="background:${outcomeColor(o)};color:#fff" title="Sort by ${escapeHTML(o)}">${escapeHTML(o)}</th>`).join('');const body=rows.map(n=>{const by=displayedAssociations(n),cells=DATA.outcomes.map(o=>{const a=by[o];return a?`<td class="rank-cell" style="color:${a.odds_ratio<1?'#2563B8':outcomeColor(o)}">${a.odds_ratio<1?'▼':'▲'} ${a.odds_ratio.toFixed(2)} <span class="stars">${stars(a.modality_corrected_p_value)}</span></td>`:'<td>—</td>'}).join('');return`<tr data-node="${n.i}"><td title="${escapeHTML(n.name)}">${escapeHTML(n.name)}</td><td style="color:${modalityColor(n.modality)};font-weight:700">${escapeHTML(n.modality)}</td>${cells}</tr>`}).join('');const table=document.getElementById('rankTable');table.innerHTML=`<thead><tr><th class="base">Concept</th><th class="base">Modality</th>${headers}</tr></thead><tbody>${body}</tbody>`;table.querySelectorAll('th[data-outcome]').forEach(th=>{th.onmouseenter=()=>highlightOutcome(th.dataset.outcome);th.onmouseleave=clearOutcomeHighlight;th.onclick=()=>renderRankings(th.dataset.outcome)});table.querySelectorAll('tbody tr').forEach(tr=>{const n=DATA.nodes[Number(tr.dataset.node)];tr.onmouseenter=()=>spotlight(n);tr.onmouseleave=clearSpotlight;tr.onclick=()=>{show(n);spotlight(n)}})}
+renderRankings();
+document.querySelectorAll('input[name="associationDirection"]').forEach(radio=>radio.onchange=()=>{associationDirection=radio.value;updateAssociationMode()});
+document.getElementById('extremeOnly').onchange=e=>{extremeOnly=e.target.checked;updateAssociationMode()};
+document.querySelectorAll('input[name="colorMode"]').forEach(radio=>radio.onchange=()=>{colorMode=radio.value;document.getElementById('colorSummary').textContent=colorMode==='outcome'?'Color: outcomes':'Color: modalities';recolor()});
+function addFacet(title,values,set){const head=document.createElement('b');head.textContent=title;facetChoices.appendChild(head);values.forEach(v=>{const label=document.createElement('label'),box=document.createElement('input'),text=document.createElement('span');box.type='checkbox';box.checked=true;text.textContent=v;label.append(box,text);facetChoices.appendChild(label);box.onchange=()=>{box.checked?set.add(v):set.delete(v);updateAssociationMode()}})}
+if(!isSimple||(DATA.modalities||[]).length>1)addFacet('Modalities',DATA.modalities||[],selectedModalities);
+if(!isSimple||(DATA.embedding_families||[]).length>1)addFacet('Embedding families',DATA.embedding_families||[],selectedFamilies);
+if(isSimple){
+ const options=document.querySelector('#displaySettings>.outcomes'),colors=document.getElementById('colorSettings'),facets=document.getElementById('facetPicker');
+ if((DATA.modalities||[]).length>1)options.append(...colors.querySelector('.outcomes').children);
+ colors.hidden=true;facets.hidden=true;
+ if(facetChoices.children.length)options.appendChild(facetChoices);
+ if(DATA.contexts?.length){options.appendChild(contextChoices);contextPicker.hidden=true}
+ const row=document.createElement('label'),checkbox=document.createElement('input'),text=document.createElement('span');
+ checkbox.type='checkbox';checkbox.id='showEdges';checkbox.checked=true;text.textContent='Show connections (up to 8 per concept)';row.append(checkbox,text);options.appendChild(row);edgeLayer.style.display='';checkbox.onchange=()=>{if(checkbox.checked)renderEdges();edgeLayer.style.display=checkbox.checked?'':'none';updateEdgeVisibility()};
+ document.querySelector('#displaySettings').setAttribute('aria-label','Display options');
+ const filter=document.createElement('label');filter.innerHTML='<input type="checkbox" id="onlySignificant"><span>Only concepts with selected associations</span>';options.appendChild(filter);filter.querySelector('input').onchange=e=>{onlySignificant=e.target.checked;applyFilters()};
+ const reset=document.createElement('button');reset.id='filterReset';reset.textContent='Reset filters';reset.onclick=()=>{onlySignificant=false;document.getElementById('onlySignificant').checked=false;document.getElementById('search').value='';associationDirection='both';extremeOnly=false;document.querySelector('input[name="associationDirection"][value="both"]').checked=true;document.getElementById('extremeOnly').checked=false;selectedModalities.clear();(DATA.modalities||[]).forEach(v=>selectedModalities.add(v));selectedFamilies.clear();(DATA.embedding_families||[]).forEach(v=>selectedFamilies.add(v));facetChoices.querySelectorAll('input').forEach(box=>box.checked=true);activeContext=null;const allContext=contextChoices.querySelector('input');if(allContext)allContext.checked=true;selected.clear();if(DATA.initial_outcome!=null)selected.add(DATA.initial_outcome);syncOutcomeBoxes();updateAssociationMode()};options.appendChild(reset);
+}
+
+function nodePassesFilter(n,q=document.getElementById('search').value.trim().toLowerCase()){return contextPasses(n)&&selectedModalities.has(n.modality)&&selectedFamilies.has(n.embedding_family)&&(!onlySignificant||selectedHits(n).length>0)&&(!q||n.name.toLowerCase().includes(q)||String(n.feature_idx).includes(q)||(n.interpretation||'').toLowerCase().includes(q))}
+function updateEdgeVisibility(){edgeLayer.querySelectorAll('.edge').forEach(edge=>{const a=DATA.nodes[Number(edge.dataset.a)],b=DATA.nodes[Number(edge.dataset.b)];edge.style.display=nodePassesFilter(a)&&nodePassesFilter(b)?'':'none'})}
+function applyFilters(){
+ const q=document.getElementById('search').value.trim().toLowerCase();let matches=0,hits=0;
+ if(selectedNode&&!nodePassesFilter(selectedNode,q))selectedNode=null;
+ DATA.nodes.forEach(n=>{const facetVisible=contextPasses(n)&&selectedModalities.has(n.modality)&&selectedFamilies.has(n.embedding_family)&&(!onlySignificant||selectedHits(n).length>0),visible=nodePassesFilter(n,q);if(visible){matches++;if(selectedHits(n).length)hits++}n.el.style.display=facetVisible?'':'none';n.hit.style.display=facetVisible?'':'none';n.hit.setAttribute('tabindex',visible?'0':'-1');n.el.classList.toggle('is-selected',n===selectedNode);n.el.style.opacity=visible?(selectedNode?(n===selectedNode?1:.2):BASE_NODE_OPACITY):.06});
+ document.getElementById('mapStatus').textContent='';
+ document.getElementById('emptyState').hidden=matches>0;updateEdgeVisibility();renderSelected();
+}
+document.getElementById('search').oninput=applyFilters;
+let scale=1,tx=0,ty=0,drag=null,moved=0;
+const apply=()=>camera.setAttribute('transform',`translate(${tx},${ty}) scale(${scale})`);
+function svgPoint(e){const point=svg.createSVGPoint();point.x=e.clientX;point.y=e.clientY;return point.matrixTransform(svg.getScreenCTM().inverse())}
+function zoomAt(point,factor){const next=Math.max(.5,Math.min(15,scale*factor));tx=point.x-(point.x-tx)*next/scale;ty=point.y-(point.y-ty)*next/scale;scale=next;apply()}
+let pendingZoom=null,zoomFrame=null;
+svg.addEventListener('wheel',e=>{
+ if(DATA.guided_mode&&!e.ctrlKey&&!e.metaKey){e.preventDefault();tip.style.opacity=0;if(window.parent!==window)window.parent.postMessage({type:'glyph:scroll',deltaY:e.deltaY,deltaMode:e.deltaMode},'*');return}
+ e.preventDefault();if(!e.deltaY)return;
+ const unit=e.deltaMode===1?16:e.deltaMode===2?svg.clientHeight:1;
+ const delta=Math.max(-160,Math.min(160,e.deltaY*unit));
+ const point=svgPoint(e);pendingZoom={point,delta:(pendingZoom?.delta||0)+delta};
+ tip.style.opacity=0;
+ if(zoomFrame===null)zoomFrame=requestAnimationFrame(()=>{
+  const zoom=pendingZoom;pendingZoom=null;zoomFrame=null;
+  if(zoom)zoomAt(zoom.point,Math.exp(-zoom.delta*.002));
+ });
+},{passive:false});
+svg.style.touchAction='none';svg.onpointerdown=e=>{if(e.button!==0||(DATA.guided_mode&&e.pointerType==='touch'))return;const point=svgPoint(e);drag={x:point.x,y:point.y,tx,ty,clientX:e.clientX,clientY:e.clientY};moved=0};
+window.addEventListener('pointerup',e=>{if(svg.hasPointerCapture(e.pointerId))svg.releasePointerCapture(e.pointerId);drag=null});
+window.addEventListener('pointercancel',()=>drag=null);
+window.addEventListener('pointermove',e=>{if(!drag)return;const point=svgPoint(e);moved=Math.max(moved,Math.abs(e.clientX-drag.clientX)+Math.abs(e.clientY-drag.clientY));if(moved<=4)return;svg.setPointerCapture(e.pointerId);tx=drag.tx+point.x-drag.x;ty=drag.ty+point.y-drag.y;apply()});
+svg.onclick=()=>{if(moved<=4)clearSelection()};
+document.getElementById('reset').onclick=()=>{scale=1;tx=0;ty=0;apply();clearSelection()};
+document.getElementById('zoomIn').onclick=()=>zoomAt({x:S/2,y:S/2},1.3);
+document.getElementById('zoomOut').onclick=()=>zoomAt({x:S/2,y:S/2},1/1.3);
+document.addEventListener('click',e=>{document.querySelectorAll('#toolbar>details[open]').forEach(menu=>{if(!menu.contains(e.target))menu.open=false})});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('details[open]').forEach(menu=>menu.open=false);clearSelection();endTour()}});
+if(!DATA.outcomes.length){
+ document.getElementById('outcomePicker').hidden=true;
+ document.querySelectorAll('#displaySettings input[name="associationDirection"],#extremeOnly,#onlySignificant').forEach(x=>x.closest('label').hidden=true);
+ colorMode='modality';
+ document.getElementById('intro').textContent='Select a concept to explore its activation frequency and available interpretation. Add outcome labels for association discovery.';
+}
+updateSummary();updateAssociationMode();apply();
+
+const TOUR=[
+ {target:'stage',title:'Read the concept map',text:'Each node is a learned concept. Solid outcome color means predictive risk (OR > 1); diagonal stripes mean protective association (OR < 1). Pie sectors show concepts associated with multiple selected outcomes. Drag to pan and scroll to zoom.'},
+ {target:'displaySettings',title:'Choose what to display',text:'Choose outcomes and use Options to filter association direction, change colors or show connections. Solid nodes indicate higher odds; striped nodes indicate lower odds.'},
+ {target:'side',title:'Explore a concept',text:'Select a concept to see its interpretation, outcome wheel and strongest associations.'}
+];
+let tourIndex=0,tourTarget=null;const tourShade=document.getElementById('tourShade'),tourCard=document.getElementById('tourCard'),TOUR_STORAGE_KEY=`glyph-tour-v2:${DATA.title}`;
+function placeTour(){if(!tourTarget)return;const r=tourTarget.getBoundingClientRect(),w=tourCard.offsetWidth,h=tourCard.offsetHeight;let left,top;if(r.width>500){left=r.left+28;top=r.top+82}else{left=Math.min(innerWidth-w-16,Math.max(16,r.left));top=r.bottom+14;if(top+h>innerHeight-16)top=Math.max(16,r.top-h-14)}tourCard.style.left=left+'px';tourCard.style.top=top+'px'}
+function showTourStep(){if(tourTarget)tourTarget.classList.remove('tour-target');const step=TOUR[tourIndex];tourTarget=document.getElementById(step.target);tourTarget.classList.add('tour-target');document.getElementById('tourKicker').textContent=`Quick tour · ${tourIndex+1} of ${TOUR.length}`;document.getElementById('tourTitle').textContent=step.title;document.getElementById('tourText').textContent=step.text;document.getElementById('tourDots').textContent=TOUR.map((_,i)=>i===tourIndex?'●':'○').join(' ');document.getElementById('tourBack').hidden=tourIndex===0;document.getElementById('tourNext').textContent=tourIndex===TOUR.length-1?'Done':'Next';requestAnimationFrame(placeTour)}
+function startTour(){tourIndex=0;tourShade.hidden=false;tourCard.hidden=false;showTourStep()}
+function endTour(){tourShade.hidden=true;tourCard.hidden=true;if(tourTarget)tourTarget.classList.remove('tour-target');tourTarget=null;try{localStorage.setItem(TOUR_STORAGE_KEY,'done')}catch(e){}}
+function tourWasSeen(){try{return localStorage.getItem(TOUR_STORAGE_KEY)==='done'}catch(e){return false}}
+document.getElementById('tourNext').onclick=()=>{if(tourIndex===TOUR.length-1)endTour();else{tourIndex++;showTourStep()}};document.getElementById('tourBack').onclick=()=>{tourIndex--;showTourStep()};document.getElementById('tourSkip').onclick=endTour;document.getElementById('tourButton').onclick=startTour;window.addEventListener('resize',placeTour);if(!isSimple&&!tourWasSeen())setTimeout(startTour,250);
+</script></body></html>

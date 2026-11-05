@@ -1,0 +1,34 @@
+# Local data and generated analysis artifacts
+data/
+private/
+outputs/
+cache/
+.cache/
+checkpoints/
+*.pkl
+*.pt
+*.pth
+*.parquet
+
+# Credentials and machine-specific configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+config/local.*
+
+# Python and editor files
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.cache/
+.venv/
+.DS_Store
+
+# Local browser verification screenshots
+/test-artifacts/
+
+# Local HF release staging and machine-specific preview helper
+/analysis/
+/open-glyph-research.sh

@@ -1,0 +1,64 @@
+{
+  "cohort": "Canonical Discovery training cohort",
+  "base_studies": 15331,
+  "features": [
+    "patient_age",
+    "patient_sex",
+    "current_smoker",
+    "heavy_alcohol_use",
+    "recent_bmi"
+  ],
+  "outcomes": 141,
+  "tests": 705,
+  "estimated": 705,
+  "population_validation": "Canonical metadata verifies all studies in train folds 0/1/2 with no validation/test overlap. All 141 outcome-specific sample counts match maximal production counts; lab-model populations can be smaller.",
+  "estimator": "Unchanged original fit_isolated_model method: unpenalized logistic regression, Fisher-information Wald confidence intervals and p-values.",
+  "normalization": "Full Discovery mean and population SD (ddof=0), before outcome masking; OR per SD.",
+  "multiple_testing_denominator": 604890,
+  "multiple_testing_note": "Clinical tests corrected over the 604185 original tests plus 705 new tests. Frozen concept estimates retain their original correction.",
+  "normalization_stats": {
+    "patient_age": {
+      "mean": 54.145576283347474,
+      "sd": 18.906957245341882,
+      "coding_values": null
+    },
+    "patient_sex": {
+      "mean": 0.4406757550061966,
+      "sd": 0.4964681600625716,
+      "coding_values": [
+        0,
+        1
+      ]
+    },
+    "current_smoker": {
+      "mean": 0.07318504989889765,
+      "sd": 0.26044000915795085,
+      "coding_values": [
+        0,
+        1
+      ]
+    },
+    "heavy_alcohol_use": {
+      "mean": 0.11832235340160459,
+      "sd": 0.3229894333985407,
+      "coding_values": [
+        0,
+        1
+      ]
+    },
+    "recent_bmi": {
+      "mean": 27.024542553642913,
+      "sd": 7.034222996708385,
+      "coding_values": null
+    }
+  },
+  "source_sha256": {
+    "labels": "3a6ce32437c080745d4c9c304bac5061c169cdf5e27dcf5b0edd242e4cadaae2",
+    "metadata": "f2f21d681cf362ebc2e231e871ea39774eb1d3f1d0407048f24ddfbe7536415a",
+    "links": "dc57d63d20d47aa2c04dc3934cb4f913f7d52544f8edf1b4d6cdda26f188709c",
+    "estimator": "247e74ecbf82d710bce97b6374fd6909c4f350d6623f64bd3be5c30e33ba017f",
+    "groups": "e928bf0e6fdc7bf4ab7ef5161c755452b0db49587ef6c373e1d5692940fa6578"
+  },
+  "payload": "Aggregate effects, counts and normalization parameters; no patient records, identifiers or activations.",
+  "sex_coding": "1 = male; 0 = female or unknown, matching canonical cohort encoding."
+}

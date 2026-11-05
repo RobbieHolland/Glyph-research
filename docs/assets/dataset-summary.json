@@ -1,0 +1,26 @@
+{
+  "source": "Manuscript v34, Figure 2 and cohort methods (pages 22\u201323)",
+  "discovery": {
+    "patients": 14652,
+    "ct_volumes": 20391,
+    "radiology_reports": 20391,
+    "ct_slices": 3262560,
+    "report_tokens": 8083882,
+    "lab_measurements": 1588003
+  },
+  "testing_combined": {
+    "patients": 26976,
+    "ct_volumes": 45139,
+    "radiology_reports": 45139,
+    "ct_slices": 7222240,
+    "report_tokens": 14342345,
+    "lab_measurements": 2184424
+  },
+  "diagnosis_vocabulary": {
+    "distinct_icd_codes": 16553,
+    "phecode_categories": 1692,
+    "prognostic_outcomes": 141
+  },
+  "lab_types": 350,
+  "note": "Counts as reported in manuscript v34. Discovery includes training and validation. Testing combines Internal Test and both external sites; it was held out from discovery."
+}

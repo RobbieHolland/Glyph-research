@@ -1,0 +1,25 @@
+{
+  "origin": "MedicalHypothesisGeneration",
+  "extraction": "Function bodies copied verbatim; unrelated imports and classes omitted. No runtime dependency on MHG.",
+  "functions": {
+    "Analysis/figures/utilities/causality.py:fmr_crossfit_splits": {
+      "sha256": "bb13b7f7c4ea7bc591a717cfd6096a91f9f4c4de9128b25495d932707088094d",
+      "lines": 26
+    },
+    "Analysis/figures/utilities/causality.py:fmr_orthogonal": {
+      "sha256": "35b7a90749c8d60cb6e12577156cdfe0ba0dd49cc9b31dbef5ac0f3816615de9",
+      "lines": 175
+    },
+    "Analysis/results/adjustment_corr035_race_chunked_20261026T040159/source_snapshot/causality.py:fmr_orthogonal": {
+      "sha256": "4134e10107e1be2f3e92addee95d8f416409cd0dcb289d6cc1108b06b970ee8d",
+      "lines": 161
+    },
+    "Analysis/figures/utilities/adjustment_covariates.py": {
+      "sha256": "e1a840df9130d198f88969dc666fd6c4e7642531ede71f5b94b8a20f0d9bc655"
+    },
+    "Analysis/run/fit_statistical_model.py:fit_isolated_model": {
+      "sha256": "ac371867447377219d9dfecfb833de80b1d77b257797cc8c7a131a42f3b4f9e1",
+      "lines": 54
+    }
+  }
+}

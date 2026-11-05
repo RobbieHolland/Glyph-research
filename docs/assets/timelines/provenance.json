@@ -1,0 +1,23 @@
+{
+  "method": "Frozen paper SVGs; plotted estimates and annotation placement unchanged. Page headings replace figure titles. Hover metadata is restricted to aggregate estimates and bibliographic fields.",
+  "source_sha256": {
+    "hfpef": {
+      "timeline.svg": "9ce356dffa9f8e2c0d149722465f2413c8e1ac7fb5ccd1ceb6133332e6a1afbc",
+      "timeline.plotly.json": "1de27dd9371308340fb48b2d639fdde186405decb1ec5cfc3bd871a8ecd06040"
+    },
+    "sepsis": {
+      "timeline.svg": "91b3d70837e62246c255914e12ed7b120c0d5a401ceceb2994030e0b4495b52e",
+      "timeline.plotly.json": "98b99efca1f9bb0d5031894b41e2904ad6163548f823a4f1e9d6f6294d0f97a8"
+    }
+  },
+  "counts": {
+    "hfpef": {
+      "points": 37,
+      "references": 13
+    },
+    "sepsis": {
+      "points": 30,
+      "references": 11
+    }
+  }
+}

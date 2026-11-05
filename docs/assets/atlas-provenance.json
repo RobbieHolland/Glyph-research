@@ -1,0 +1,77 @@
+{
+  "paper_version": 34,
+  "study": {
+    "tested_associations": 604185,
+    "discovery_associations": 4463,
+    "high_risk_concepts": 397,
+    "outcomes": 141
+  },
+  "atlas": {
+    "nodes": 347,
+    "concepts": 342,
+    "clinical_anchors": 5,
+    "edges": 659,
+    "association_estimates": 47503,
+    "seed": 1283,
+    "coordinates": "Unmodified x_frac/y_frac from the verified paper coordinate export; no fitting, jitter or force layout.",
+    "node_sizes": "Exact radii, colors, opacity, outlines and edge widths extracted from the verified 1296-point paper SVG.",
+    "site": "Discovery",
+    "model": "Unadjusted per-standard-deviation odds ratios",
+    "multiple_testing_denominator": 604185
+  },
+  "source_sha256": {
+    "layout_coordinates": "7f5e1c6eb7040c41566716c25f6558c36b6b0b43eb343dc9e24a00d5241da7b3",
+    "layout_graph": "bba7409d9aadb927db5d9d1d7d635d6f1e96d0f336ca7b3078d4575616e46505",
+    "association_snapshot": "dc57d63d20d47aa2c04dc3934cb4f913f7d52544f8edf1b4d6cdda26f188709c",
+    "outcome_groups": "e928bf0e6fdc7bf4ab7ef5161c755452b0db49587ef6c373e1d5692940fa6578",
+    "revised_interpretations": "6b1428f14fce6f7cd7bf4f243d1494731474c7724bda66234e9defc92294bdff",
+    "glyph_renderer": "cc46fdf828d964152ec70161e91d53a67af6f6cb171b20df26440f953beefab0",
+    "paper_v34": "ca8058c2bd39461bddb622e0bb191e9b8b857fcb395db5e6f2e48a327cfccfe8",
+    "paper_svg": "e1f2a69301296ae7cc7eb2bd4c34d3376ef70e8fdd8b0744c76f4c59a9a3428b",
+    "clinical_associations": "eda018037e635aab74bbf0fc69ca86fd981b95f491b24c809977e84b348cab80"
+  },
+  "revised_interpretations": {
+    "applied": 29,
+    "concepts": [
+      "L87",
+      "L127",
+      "L94",
+      "L91",
+      "L62",
+      "L124",
+      "L82",
+      "L34",
+      "L35",
+      "L26",
+      "L77",
+      "L4",
+      "L2358",
+      "L59",
+      "L45",
+      "L121",
+      "L496",
+      "L36",
+      "L0",
+      "L68",
+      "L69",
+      "L1121",
+      "L508",
+      "L1275",
+      "I109",
+      "L105",
+      "L1488",
+      "L323",
+      "I87"
+    ],
+    "precedence": "Curated revised text overrides the original AutoInterp description; concept IDs/statistics/positions are unchanged."
+  },
+  "payload": "Aggregate concept positions, coactivation display edges, interpretations and association estimates only; no patient records or images.",
+  "exclusions": "No Mayo laboratory or diagnostic-phecode estimates are displayed. Five clinical variables now have separately computed Discovery estimates.",
+  "clinical_associations": {
+    "features": 5,
+    "tested": 705,
+    "estimated": 705,
+    "multiple_testing_denominator": 604890,
+    "provenance_url": "assets/clinical-associations-provenance.json"
+  }
+}

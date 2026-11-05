@@ -1,0 +1,44 @@
+.timelines-section{padding-top:75px;padding-bottom:68px}
+.timelines-section>h2{font-size:30px;letter-spacing:-1px;font-weight:550;margin:0 0 12px}
+.timeline-intro{font-size:13px;color:#737373;margin:0 0 38px;max-width:700px}
+.timeline-example{padding:26px 0 35px;border-top:1px solid #ededed}
+.timeline-example+.timeline-example{margin-top:20px}
+.timeline-example-heading{display:flex;align-items:baseline;justify-content:space-between;gap:18px;margin-bottom:20px}
+.timeline-example-heading h3{font-size:21px;font-weight:500;letter-spacing:-.5px;margin:0}
+.timeline-example-heading>a{font-size:11px;white-space:nowrap;color:#737373;text-decoration:none}
+.timeline-scroll{width:100%;overflow-x:auto;overscroll-behavior-x:contain}
+.timeline-figure{display:block;width:100%;height:auto;min-width:1050px}
+.timeline-figure [data-timeline-point]{cursor:pointer}
+.timeline-hit:focus-visible{outline:none;stroke:#171717;stroke-width:3;fill:#99000014}
+.timeline-reference:focus-visible{outline:2px solid #171717;outline-offset:5px}
+.timeline-references{margin-top:15px;max-width:950px}
+.timeline-references summary{font-size:11px;color:#737373;cursor:pointer}
+.timeline-references ol{padding-left:20px;font-size:12px;line-height:1.7;color:#525252}
+.timeline-references li{margin-bottom:10px}
+.timeline-references a{text-decoration-color:#d4d4d4;text-underline-offset:3px}
+#timeline-detail{width:min(570px,calc(100vw - 36px));max-height:85vh;padding:36px;border:1px solid #e5e5e5;border-radius:14px;color:#171717;background:#fff;box-shadow:0 20px 80px #00000024}
+#timeline-detail::backdrop{background:#00000045;backdrop-filter:blur(3px)}
+#timeline-close{position:absolute;top:10px;right:14px;border:0;background:none;color:#737373;font-size:25px;cursor:pointer}
+.timeline-detail-kind{font-size:11px;color:#737373;margin:0 0 12px}
+#timeline-detail h2{font-weight:500;font-size:24px;line-height:1.35;letter-spacing:-.4px;margin:0 0 20px}
+.timeline-detail-stats{font-size:15px;margin:0 0 8px}.timeline-detail-p{font-size:12px;color:#737373;margin:0 0 25px}
+.timeline-paper-title{font-size:14px;line-height:1.7;color:#525252;margin:0 0 16px}
+.timeline-paper-link,.timeline-concept-link{display:inline-block;border:1px solid #dedede;border-radius:24px;padding:9px 16px;font:12px/1.5 "Helvetica Neue",Helvetica,Arial,sans-serif;text-decoration:none;color:#171717;background:#fff}
+.timeline-paper-link:hover,.timeline-concept-link:hover{background:#f5f5f5}
+#timeline-tooltip{position:fixed;z-index:60;pointer-events:none;width:max-content;max-width:min(350px,calc(100vw - 20px));padding:11px 14px;border-radius:9px;background:#171717;color:white;font-size:12px;line-height:1.5;box-shadow:0 6px 24px #00000018}
+#timeline-tooltip strong{display:block;font-weight:500;margin-bottom:4px}#timeline-tooltip span{display:block;color:#dedede;font-size:11px}
+.about-heading{padding-top:55px}.about-heading h1{font-size:44px;font-weight:500;letter-spacing:-1.5px}.about-heading+.study-section{padding-top:25px}
+@media(max-width:580px){.timelines-section{padding-top:48px;padding-bottom:40px}.timelines-section>h2{font-size:26px}.timeline-intro{font-size:12px;margin-bottom:25px}.timeline-example-heading{align-items:flex-start}.timeline-example-heading h3{font-size:18px;max-width:250px}.timeline-example-heading>a{font-size:10px}.timeline-example{padding-top:22px}.timeline-references ol{font-size:11px}#timeline-detail{padding:29px 24px}}
+
+.timeline-paper-link{display:inline-flex;align-items:center;gap:7px}
+.timeline-paper-link svg{width:15px;height:15px;flex:none;fill:none;stroke:currentColor;stroke-width:1.25;stroke-linecap:round;stroke-linejoin:round}
+
+.timeline-rule{margin:18px 0;padding:15px 16px;border:1px solid #e5e5e5;border-radius:10px;background:#fafafa}
+.timeline-rule h3{margin:0 0 9px;font-size:12px;font-weight:600;letter-spacing:.03em}
+.timeline-rule-summary{font-size:13px;line-height:1.55;margin:0 0 9px}
+.timeline-rule-note{font-size:12px;line-height:1.6;color:#525252;margin:0 0 12px}
+.timeline-rule summary{cursor:pointer;font-size:12px;color:#404040}
+.timeline-rule pre{font-size:11px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow:auto;margin:10px 0 0}
+.timeline-rule-units{font-size:10px;color:#737373;line-height:1.55;margin:12px 0 0}
+
+.timeline-glyph-interpretation{font-size:14px;line-height:1.6;color:#525252;margin:16px 0 22px}

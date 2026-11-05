@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Glyph in a nutshell — figure draft</title>
+<style>
+  :root{--ink:#202522;--muted:#68706b;--line:#d9ddda;--paper:#f4f5f2;--image:#4e83a6;--report:#ee9b35;--lab:#47a44f;--concept:#315f78;--soft:#f8f9f7}
+  *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  .page{max-width:2100px;margin:auto;padding:26px}.top{display:flex;align-items:end;justify-content:space-between;gap:24px;margin:0 0 14px}.eyebrow{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}h1{font-size:26px;margin:5px 0 0;letter-spacing:-.025em}.note{font-size:12px;color:var(--muted);max-width:440px;text-align:right}
+  .frame{background:white;border:1px solid var(--line);box-shadow:0 12px 35px rgba(31,43,37,.06);overflow:auto}.frame svg{display:block;width:100%;height:auto;min-width:1500px}
+  .legend{display:flex;gap:20px;align-items:center;margin:13px 2px 0;color:var(--muted);font-size:12px}.legend span{display:inline-flex;align-items:center;gap:7px}.swatch{width:11px;height:11px}.image{background:var(--image)}.report{background:var(--report)}.lab{background:var(--lab)}
+  @media(max-width:760px){.page{padding:12px}.top{display:block}.note{text-align:left;margin-top:8px}.frame svg{min-width:1400px}}
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="top">
+    <div><div class="eyebrow">Figure draft · project overview</div><h1>Glyph in a nutshell</h1></div>
+    <div class="note">From heterogeneous clinical observations to reusable concepts and validated clinical discoveries.</div>
+  </header>
+
+  <div class="frame">
+  <svg viewBox="0 0 2200 860" font-family="Inter,Arial,sans-serif" role="img" aria-labelledby="title desc" xmlns="http://www.w3.org/2000/svg">
+    <title id="title">Glyph project overview</title>
+    <desc id="desc">Multimodal medical data are encoded by foundation models into embeddings. Interpretable concepts emerge as a connected concept space and are associated with disease-specific clinical outcomes.</desc>
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#89928d"/></marker>
+      <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="7" stdDeviation="9" flood-color="#22332b" flood-opacity=".08"/></filter>
+      <linearGradient id="spaceGlow" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1f7f9"/><stop offset="1" stop-color="#f7f9f5"/></linearGradient>
+    </defs>
+    <rect width="2200" height="860" fill="#fff"/>
+
+    <!-- column labels -->
+    <text x="72" y="73" fill="#68706b" font-size="12" font-weight="800" letter-spacing="2">01 · OBSERVE</text>
+    <text x="416" y="73" fill="#68706b" font-size="12" font-weight="800" letter-spacing="2">02 · REPRESENT</text>
+    <text x="759" y="73" fill="#68706b" font-size="12" font-weight="800" letter-spacing="2">03 · INTERPRET</text>
+    <text x="1225" y="73" fill="#68706b" font-size="12" font-weight="800" letter-spacing="2">04 · DISCOVER</text>
+
+    <!-- data -->
+    <text x="72" y="112" fill="#202522" font-size="24" font-weight="750">Multimodal medical data</text>
+    <text x="72" y="137" fill="#68706b" font-size="14">Different views of the same patient journey</text>
+
+    <g filter="url(#shadow)">
+      <rect x="72" y="182" width="255" height="146" fill="#fff" stroke="#d9ddda"/>
+      <rect x="72" y="182" width="7" height="146" fill="#4e83a6"/>
+      <rect x="99" y="207" width="90" height="82" rx="3" fill="#eaf1f5" stroke="#b9cbd6"/>
+      <path d="M121 228c9-12 35-12 44 0 5 7 4 17-1 24-6 9-8 20-10 28h-22c-2-8-4-19-10-28-5-7-6-17-1-24Z" fill="none" stroke="#4e83a6" stroke-width="3"/>
+      <path d="M143 215v67M113 247h60" stroke="#c9d8e1" stroke-width="2"/>
+      <text x="207" y="225" fill="#202522" font-size="16" font-weight="700">CT imaging</text>
+      <text x="207" y="249" fill="#68706b" font-size="12">Anatomy</text><text x="207" y="268" fill="#68706b" font-size="12">morphology</text><text x="207" y="287" fill="#68706b" font-size="12">spatial context</text>
+
+      <rect x="72" y="349" width="255" height="146" fill="#fff" stroke="#d9ddda"/>
+      <rect x="72" y="349" width="7" height="146" fill="#ee9b35"/>
+      <path d="M102 378h76v87h-76Z" fill="#fff8ee" stroke="#dfbd91"/><path d="M114 398h52M114 411h45M114 424h49M114 437h38" stroke="#ee9b35" stroke-width="3"/>
+      <text x="207" y="392" fill="#202522" font-size="16" font-weight="700">Radiology reports</text>
+      <text x="207" y="416" fill="#68706b" font-size="12">Clinical language</text><text x="207" y="435" fill="#68706b" font-size="12">observations</text><text x="207" y="454" fill="#68706b" font-size="12">interpretation</text>
+
+      <rect x="72" y="516" width="255" height="146" fill="#fff" stroke="#d9ddda"/>
+      <rect x="72" y="516" width="7" height="146" fill="#47a44f"/>
+      <path d="M109 548h54M115 548v22l-12 37c-3 11 4 25 17 25h32c13 0 20-14 17-25l-12-37v-22" fill="#eef8ef" stroke="#47a44f" stroke-width="3"/>
+      <path d="M108 602h56" stroke="#47a44f" stroke-width="3"/>
+      <text x="207" y="559" fill="#202522" font-size="16" font-weight="700">Laboratory data</text>
+      <text x="207" y="583" fill="#68706b" font-size="12">Physiology</text><text x="207" y="602" fill="#68706b" font-size="12">chemistry</text><text x="207" y="621" fill="#68706b" font-size="12">longitudinal state</text>
+    </g>
+
+    <!-- arrows into models -->
+    <path d="M345 255H395" stroke="#89928d" stroke-width="2" marker-end="url(#arrow)"/>
+    <path d="M345 422H395" stroke="#89928d" stroke-width="2" marker-end="url(#arrow)"/>
+    <path d="M345 589H395" stroke="#89928d" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- FMs and embeddings -->
+    <text x="416" y="112" fill="#202522" font-size="24" font-weight="750">Foundation models</text>
+    <text x="416" y="137" fill="#68706b" font-size="14">FM layers → embeddings</text>
+    <rect x="416" y="182" width="272" height="480" rx="18" fill="#fbfcfb" stroke="#d9ddda"/>
+    <rect x="430" y="221" width="244" height="119" rx="10" fill="#f1f7fa" stroke="#4e83a6" stroke-opacity=".3"/>
+    <text x="444" y="244" fill="#4e83a6" font-size="12" font-weight="800" letter-spacing=".7">IMAGE FM</text>
+    <text x="603" y="244" fill="#68706b" font-size="10" text-anchor="middle">EMBEDDING</text>
+    <rect x="449" y="278" width="53" height="20" rx="4" fill="white" stroke="#4e83a6" stroke-opacity=".75"/>
+    <rect x="461" y="286" width="53" height="20" rx="4" fill="white" stroke="#4e83a6" stroke-opacity=".75"/>
+    <rect x="473" y="294" width="53" height="20" rx="4" fill="white" stroke="#4e83a6" stroke-opacity=".75"/>
+    <text x="500" y="329" text-anchor="middle" fill="#4e83a6" font-size="17" font-weight="700">⋯</text>
+    <path d="M531 295h17" stroke="#4e83a6" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <rect x="555" y="258" width="94" height="67" rx="3" fill="white" stroke="#4e83a6" stroke-opacity=".3"/>
+    <rect x="561" y="264" width="10" height="10" rx="1" fill="#4e83a6" opacity="0.18"/>
+    <rect x="575" y="264" width="10" height="10" rx="1" fill="#4e83a6" opacity="0.52"/>
+    <rect x="589" y="264" width="10" height="10" rx="1" fill="#4e83a6" opacity="0.83"/>
+    <rect x="603" y="264" width="10" height="10" rx="1" fill="#4e83a6" opacity="0.36"/>
+    <rect x="617" y="264" width="10" height="10" rx="1" fill="#4e83a6" opacity="0.67"/>
+    <rect x="631" y="264" width="10" height="10" rx="1" fill="#4e83a6" opacity="0.23"/>
+    <rect x="561" y="278" width="10" height="10" rx="1" fill="#4e83a6" opacity="0.74"/>
+    <rect x="575" y="278" width="10" height="10" rx="1" fill="#4e83a6" opacity="0.29"/>
+    <rect x="589" y="278" width="10" height="10" rx="1" fill="#4e83a6" opacity="0.46"/>
+    <rect x="603" y="278" width="10" height="10" rx="1" fill="#4e83a6" opacity="0.91"/>
+    <rect x="617" y="278" width="10" height="10" rx="1" fill="#4e83a6" opacity="0.35"/>
+    <rect x="631" y="278" width="10" height="10" rx="1" fill="#4e83a6" opacity="0.62"/>
+    <rect x="561" y="292" width="10" height="10" rx="1" fill="#4e83a6" opacity="0.41"/>
+    <rect x="575" y="292" width="10" height="10" rx="1" fill="#4e83a6" opacity="0.86"/>
+    <rect x="589" y="292" width="10" height="10" rx="1" fill="#4e83a6" opacity="0.2"/>
+    <rect x="603" y="292" width="10" height="10" rx="1" fill="#4e83a6" opacity="0.59"/>
+    <rect x="617" y="292" width="10" height="10" rx="1" fill="#4e83a6" opacity="0.77"/>
+    <rect x="631" y="292" width="10" height="10" rx="1" fill="#4e83a6" opacity="0.31"/>
+    <rect x="561" y="306" width="10" height="10" rx="1" fill="#4e83a6" opacity="0.65"/>
+    <rect x="575" y="306" width="10" height="10" rx="1" fill="#4e83a6" opacity="0.33"/>
+    <rect x="589" y="306" width="10" height="10" rx="1" fill="#4e83a6" opacity="0.72"/>
+    <rect x="603" y="306" width="10" height="10" rx="1" fill="#4e83a6" opacity="0.27"/>
+    <rect x="617" y="306" width="10" height="10" rx="1" fill="#4e83a6" opacity="0.48"/>
+    <rect x="631" y="306" width="10" height="10" rx="1" fill="#4e83a6" opacity="0.89"/>
+    <rect x="430" y="366" width="244" height="119" rx="10" fill="#fff7ed" stroke="#ee9b35" stroke-opacity=".3"/>
+    <text x="444" y="389" fill="#ee9b35" font-size="12" font-weight="800" letter-spacing=".7">LANGUAGE FM</text>
+    <text x="603" y="389" fill="#68706b" font-size="10" text-anchor="middle">EMBEDDING</text>
+    <rect x="449" y="423" width="53" height="20" rx="4" fill="white" stroke="#ee9b35" stroke-opacity=".75"/>
+    <rect x="461" y="431" width="53" height="20" rx="4" fill="white" stroke="#ee9b35" stroke-opacity=".75"/>
+    <rect x="473" y="439" width="53" height="20" rx="4" fill="white" stroke="#ee9b35" stroke-opacity=".75"/>
+    <text x="500" y="474" text-anchor="middle" fill="#ee9b35" font-size="17" font-weight="700">⋯</text>
+    <path d="M531 440h17" stroke="#ee9b35" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <rect x="555" y="403" width="94" height="67" rx="3" fill="white" stroke="#ee9b35" stroke-opacity=".3"/>
+    <rect x="561" y="409" width="10" height="10" rx="1" fill="#ee9b35" opacity="0.74"/>
+    <rect x="575" y="409" width="10" height="10" rx="1" fill="#ee9b35" opacity="0.29"/>
+    <rect x="589" y="409" width="10" height="10" rx="1" fill="#ee9b35" opacity="0.46"/>
+    <rect x="603" y="409" width="10" height="10" rx="1" fill="#ee9b35" opacity="0.91"/>
+    <rect x="617" y="409" width="10" height="10" rx="1" fill="#ee9b35" opacity="0.35"/>
+    <rect x="631" y="409" width="10" height="10" rx="1" fill="#ee9b35" opacity="0.62"/>
+    <rect x="561" y="423" width="10" height="10" rx="1" fill="#ee9b35" opacity="0.41"/>
+    <rect x="575" y="423" width="10" height="10" rx="1" fill="#ee9b35" opacity="0.86"/>
+    <rect x="589" y="423" width="10" height="10" rx="1" fill="#ee9b35" opacity="0.2"/>
+    <rect x="603" y="423" width="10" height="10" rx="1" fill="#ee9b35" opacity="0.59"/>
+    <rect x="617" y="423" width="10" height="10" rx="1" fill="#ee9b35" opacity="0.77"/>
+    <rect x="631" y="423" width="10" height="10" rx="1" fill="#ee9b35" opacity="0.31"/>
+    <rect x="561" y="437" width="10" height="10" rx="1" fill="#ee9b35" opacity="0.65"/>
+    <rect x="575" y="437" width="10" height="10" rx="1" fill="#ee9b35" opacity="0.33"/>
+    <rect x="589" y="437" width="10" height="10" rx="1" fill="#ee9b35" opacity="0.72"/>
+    <rect x="603" y="437" width="10" height="10" rx="1" fill="#ee9b35" opacity="0.27"/>
+    <rect x="617" y="437" width="10" height="10" rx="1" fill="#ee9b35" opacity="0.48"/>
+    <rect x="631" y="437" width="10" height="10" rx="1" fill="#ee9b35" opacity="0.89"/>
+    <rect x="561" y="451" width="10" height="10" rx="1" fill="#ee9b35" opacity="0.18"/>
+    <rect x="575" y="451" width="10" height="10" rx="1" fill="#ee9b35" opacity="0.52"/>
+    <rect x="589" y="451" width="10" height="10" rx="1" fill="#ee9b35" opacity="0.83"/>
+    <rect x="603" y="451" width="10" height="10" rx="1" fill="#ee9b35" opacity="0.36"/>
+    <rect x="617" y="451" width="10" height="10" rx="1" fill="#ee9b35" opacity="0.67"/>
+    <rect x="631" y="451" width="10" height="10" rx="1" fill="#ee9b35" opacity="0.23"/>
+    <rect x="430" y="511" width="244" height="119" rx="10" fill="#f1faf2" stroke="#47a44f" stroke-opacity=".3"/>
+    <text x="444" y="534" fill="#47a44f" font-size="12" font-weight="800" letter-spacing=".7">CLINICAL FM</text>
+    <text x="603" y="534" fill="#68706b" font-size="10" text-anchor="middle">EMBEDDING</text>
+    <rect x="449" y="568" width="53" height="20" rx="4" fill="white" stroke="#47a44f" stroke-opacity=".75"/>
+    <rect x="461" y="576" width="53" height="20" rx="4" fill="white" stroke="#47a44f" stroke-opacity=".75"/>
+    <rect x="473" y="584" width="53" height="20" rx="4" fill="white" stroke="#47a44f" stroke-opacity=".75"/>
+    <text x="500" y="619" text-anchor="middle" fill="#47a44f" font-size="17" font-weight="700">⋯</text>
+    <path d="M531 585h17" stroke="#47a44f" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <rect x="555" y="548" width="94" height="67" rx="3" fill="white" stroke="#47a44f" stroke-opacity=".3"/>
+    <rect x="561" y="554" width="10" height="10" rx="1" fill="#47a44f" opacity="0.41"/>
+    <rect x="575" y="554" width="10" height="10" rx="1" fill="#47a44f" opacity="0.86"/>
+    <rect x="589" y="554" width="10" height="10" rx="1" fill="#47a44f" opacity="0.2"/>
+    <rect x="603" y="554" width="10" height="10" rx="1" fill="#47a44f" opacity="0.59"/>
+    <rect x="617" y="554" width="10" height="10" rx="1" fill="#47a44f" opacity="0.77"/>
+    <rect x="631" y="554" width="10" height="10" rx="1" fill="#47a44f" opacity="0.31"/>
+    <rect x="561" y="568" width="10" height="10" rx="1" fill="#47a44f" opacity="0.65"/>
+    <rect x="575" y="568" width="10" height="10" rx="1" fill="#47a44f" opacity="0.33"/>
+    <rect x="589" y="568" width="10" height="10" rx="1" fill="#47a44f" opacity="0.72"/>
+    <rect x="603" y="568" width="10" height="10" rx="1" fill="#47a44f" opacity="0.27"/>
+    <rect x="617" y="568" width="10" height="10" rx="1" fill="#47a44f" opacity="0.48"/>
+    <rect x="631" y="568" width="10" height="10" rx="1" fill="#47a44f" opacity="0.89"/>
+    <rect x="561" y="582" width="10" height="10" rx="1" fill="#47a44f" opacity="0.18"/>
+    <rect x="575" y="582" width="10" height="10" rx="1" fill="#47a44f" opacity="0.52"/>
+    <rect x="589" y="582" width="10" height="10" rx="1" fill="#47a44f" opacity="0.83"/>
+    <rect x="603" y="582" width="10" height="10" rx="1" fill="#47a44f" opacity="0.36"/>
+    <rect x="617" y="582" width="10" height="10" rx="1" fill="#47a44f" opacity="0.67"/>
+    <rect x="631" y="582" width="10" height="10" rx="1" fill="#47a44f" opacity="0.23"/>
+    <rect x="561" y="596" width="10" height="10" rx="1" fill="#47a44f" opacity="0.74"/>
+    <rect x="575" y="596" width="10" height="10" rx="1" fill="#47a44f" opacity="0.29"/>
+    <rect x="589" y="596" width="10" height="10" rx="1" fill="#47a44f" opacity="0.46"/>
+    <rect x="603" y="596" width="10" height="10" rx="1" fill="#47a44f" opacity="0.91"/>
+    <rect x="617" y="596" width="10" height="10" rx="1" fill="#47a44f" opacity="0.35"/>
+    <rect x="631" y="596" width="10" height="10" rx="1" fill="#47a44f" opacity="0.62"/>
+    <path d="M706 422H750" stroke="#89928d" stroke-width="2" marker-end="url(#arrow)"/>
+    <!-- concept space -->
+    <text x="759" y="112" fill="#202522" font-size="24" font-weight="750">Interpretable concept space</text>
+    <text x="759" y="137" fill="#68706b" font-size="14">A large vocabulary emerges across modalities</text>
+    <rect x="759" y="182" width="414" height="480" rx="18" fill="url(#spaceGlow)" stroke="#d9ddda"/>
+    <g fill="none" stroke="#aeb8b3" stroke-opacity=".55" stroke-width="1.4">
+      <path d="M819 280L892 234L968 287L1057 232L1119 313L1043 363L1122 430L1047 508L955 469L881 542L806 467L860 384Z"/>
+      <path d="M819 280L860 384L968 287L1043 363L955 469L860 384L881 542M892 234L860 384M1057 232L1043 363M1119 313L1122 430M806 467L955 469M1047 508L1122 430"/>
+      <path d="M826 606L881 542L955 584L1047 508L1111 584"/>
+    </g>
+    <g>
+      <circle cx="819" cy="280" r="14" fill="#4e83a6"/><circle cx="892" cy="234" r="9" fill="#4e83a6"/><circle cx="968" cy="287" r="17" fill="#ee9b35"/><circle cx="1057" cy="232" r="11" fill="#47a44f"/><circle cx="1119" cy="313" r="8" fill="#ee9b35"/>
+      <circle cx="860" cy="384" r="19" fill="#4e83a6"/><circle cx="1043" cy="363" r="15" fill="#47a44f"/><circle cx="1122" cy="430" r="13" fill="#4e83a6"/><circle cx="955" cy="469" r="20" fill="#ee9b35"/>
+      <circle cx="806" cy="467" r="8" fill="#47a44f"/><circle cx="881" cy="542" r="13" fill="#47a44f"/><circle cx="1047" cy="508" r="10" fill="#4e83a6"/><circle cx="826" cy="606" r="7" fill="#ee9b35"/><circle cx="955" cy="584" r="9" fill="#4e83a6"/><circle cx="1111" cy="584" r="8" fill="#47a44f"/>
+      <g fill="#fff" stroke="#d9ddda"><rect x="786" y="306" width="113" height="27"/><rect x="928" y="314" width="108" height="27"/><rect x="1015" y="389" width="117" height="27"/><rect x="891" y="496" width="124" height="27"/></g>
+      <g fill="#202522" font-size="11" font-weight="700"><text x="842" y="324" text-anchor="middle">Cortical thinning</text><text x="982" y="332" text-anchor="middle">Cirrhosis</text><text x="1073" y="407" text-anchor="middle">Cholestasis</text><text x="953" y="514" text-anchor="middle">Fluid overload</text></g>
+    </g>
+    <rect x="795" y="622" width="342" height="1" fill="#d9ddda"/><text x="966" y="645" text-anchor="middle" fill="#68706b" font-size="12">Each node is a human-readable clinical concept</text>
+
+    <!-- discoveries -->
+    <path d="M1184 422H1207" stroke="#89928d" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="1225" y="112" fill="#202522" font-size="24" font-weight="750">Clinical rediscoveries and new leads</text>
+    <text x="1225" y="137" fill="#68706b" font-size="14">Four outcome axes; colored spokes mark the source modality</text>
+    <path d="M1450 301L1310 224" stroke="#ee9b35" stroke-opacity=".48" stroke-width="1.5"/>
+    <path d="M1450 301L1590 224" stroke="#47a44f" stroke-opacity=".48" stroke-width="1.5"/>
+    <path d="M1450 301L1450 382" stroke="#4e83a6" stroke-opacity=".48" stroke-width="1.5"/>
+    <circle cx="1450" cy="301" r="52" fill="#fafbfa" stroke="#c97918" stroke-width="2"/>
+    <text x="1450" y="299" text-anchor="middle" fill="#202522" font-size="15" font-weight="750">Hepatic</text>
+    <text x="1450" y="318" text-anchor="middle" fill="#68706b" font-size="11">11 outcomes</text>
+    <circle cx="1310" cy="224" r="9" fill="white" stroke="#ee9b35" stroke-width="2.4"/>
+    <text x="1310" y="246" text-anchor="middle" fill="#202522" font-size="11.5" font-weight="700">R85 · Cirrhosis</text>
+    <text x="1310" y="261" text-anchor="middle" fill="#c97918" font-size="10">known</text>
+    <circle cx="1590" cy="224" r="9" fill="white" stroke="#47a44f" stroke-width="2.4"/>
+    <text x="1590" y="246" text-anchor="middle" fill="#202522" font-size="11.5" font-weight="700">L108 · Cholestasis</text>
+    <text x="1590" y="261" text-anchor="middle" fill="#c97918" font-size="10">known</text>
+    <circle cx="1450" cy="382" r="9" fill="white" stroke="#4e83a6" stroke-width="2.4"/>
+    <text x="1450" y="404" text-anchor="middle" fill="#202522" font-size="11.5" font-weight="700">I87 · Absent gallbladder</text>
+    <text x="1450" y="419" text-anchor="middle" fill="#c97918" font-size="10">new lead</text>
+    <path d="M1920 301L1780 224" stroke="#47a44f" stroke-opacity=".48" stroke-width="1.5"/>
+    <path d="M1920 301L2060 224" stroke="#4e83a6" stroke-opacity=".48" stroke-width="1.5"/>
+    <path d="M1920 301L1920 382" stroke="#47a44f" stroke-opacity=".48" stroke-width="1.5"/>
+    <circle cx="1920" cy="301" r="52" fill="#fafbfa" stroke="#4e83a6" stroke-width="2"/>
+    <text x="1920" y="299" text-anchor="middle" fill="#202522" font-size="15" font-weight="750">Renal</text>
+    <text x="1920" y="318" text-anchor="middle" fill="#68706b" font-size="11">13 outcomes</text>
+    <circle cx="1780" cy="224" r="9" fill="white" stroke="#47a44f" stroke-width="2.4"/>
+    <text x="1780" y="246" text-anchor="middle" fill="#202522" font-size="11.5" font-weight="700">L84 · Azotemia</text>
+    <text x="1780" y="261" text-anchor="middle" fill="#4e83a6" font-size="10">known</text>
+    <circle cx="2060" cy="224" r="9" fill="white" stroke="#4e83a6" stroke-width="2.4"/>
+    <text x="2060" y="246" text-anchor="middle" fill="#202522" font-size="11.5" font-weight="700">I109 · Aortic calcification</text>
+    <text x="2060" y="261" text-anchor="middle" fill="#4e83a6" font-size="10">known</text>
+    <circle cx="1920" cy="382" r="9" fill="white" stroke="#47a44f" stroke-width="2.4"/>
+    <text x="1920" y="404" text-anchor="middle" fill="#202522" font-size="11.5" font-weight="700">L108 · Cholestasis</text>
+    <text x="1920" y="419" text-anchor="middle" fill="#4e83a6" font-size="10">new lead</text>
+    <path d="M1450 546L1310 469" stroke="#4e83a6" stroke-opacity=".48" stroke-width="1.5"/>
+    <path d="M1450 546L1590 469" stroke="#47a44f" stroke-opacity=".48" stroke-width="1.5"/>
+    <path d="M1450 546L1450 627" stroke="#47a44f" stroke-opacity=".48" stroke-width="1.5"/>
+    <circle cx="1450" cy="546" r="52" fill="#fafbfa" stroke="#b55c61" stroke-width="2"/>
+    <text x="1450" y="544" text-anchor="middle" fill="#202522" font-size="15" font-weight="750">Cardiovascular</text>
+    <text x="1450" y="563" text-anchor="middle" fill="#68706b" font-size="11">28 outcomes</text>
+    <circle cx="1310" cy="469" r="9" fill="white" stroke="#4e83a6" stroke-width="2.4"/>
+    <text x="1310" y="491" text-anchor="middle" fill="#202522" font-size="11.5" font-weight="700">I26 · Aortic atherosclerosis</text>
+    <text x="1310" y="506" text-anchor="middle" fill="#b55c61" font-size="10">known</text>
+    <circle cx="1590" cy="469" r="9" fill="white" stroke="#47a44f" stroke-width="2.4"/>
+    <text x="1590" y="491" text-anchor="middle" fill="#202522" font-size="11.5" font-weight="700">L68 · Inflammation</text>
+    <text x="1590" y="506" text-anchor="middle" fill="#b55c61" font-size="10">known</text>
+    <circle cx="1450" cy="627" r="9" fill="white" stroke="#47a44f" stroke-width="2.4"/>
+    <text x="1450" y="649" text-anchor="middle" fill="#202522" font-size="11.5" font-weight="700">L121 · Conduction delay</text>
+    <text x="1450" y="664" text-anchor="middle" fill="#b55c61" font-size="10">revised</text>
+    <path d="M1920 546L1780 469" stroke="#47a44f" stroke-opacity=".48" stroke-width="1.5"/>
+    <path d="M1920 546L2060 469" stroke="#47a44f" stroke-opacity=".48" stroke-width="1.5"/>
+    <path d="M1920 546L1920 627" stroke="#4e83a6" stroke-opacity=".48" stroke-width="1.5"/>
+    <circle cx="1920" cy="546" r="52" fill="#fafbfa" stroke="#766aa5" stroke-width="2"/>
+    <text x="1920" y="544" text-anchor="middle" fill="#202522" font-size="15" font-weight="750">Systemic</text>
+    <text x="1920" y="563" text-anchor="middle" fill="#68706b" font-size="11">141 outcomes</text>
+    <circle cx="1780" cy="469" r="9" fill="white" stroke="#47a44f" stroke-width="2.4"/>
+    <text x="1780" y="491" text-anchor="middle" fill="#202522" font-size="11.5" font-weight="700">L127 · Cytopenia / RDW</text>
+    <text x="1780" y="506" text-anchor="middle" fill="#766aa5" font-size="10">new lead</text>
+    <circle cx="2060" cy="469" r="9" fill="white" stroke="#47a44f" stroke-width="2.4"/>
+    <text x="2060" y="491" text-anchor="middle" fill="#202522" font-size="11.5" font-weight="700">L108 · Cholestasis</text>
+    <text x="2060" y="506" text-anchor="middle" fill="#766aa5" font-size="10">supported</text>
+    <circle cx="1920" cy="627" r="9" fill="white" stroke="#4e83a6" stroke-width="2.4"/>
+    <text x="1920" y="649" text-anchor="middle" fill="#202522" font-size="11.5" font-weight="700">I21 · Ascites</text>
+    <text x="1920" y="664" text-anchor="middle" fill="#766aa5" font-size="10">marker</text>
+    <text x="1225" y="684" fill="#68706b" font-size="11">Examples shown. Literature classification and complete evidence are in the evidence explorer.</text>
+
+    <!-- bottom synthesis -->
+    <line x1="72" y1="725" x2="2130" y2="725" stroke="#d9ddda"/>
+    <text x="72" y="768" fill="#202522" font-size="18" font-weight="750">One reusable concept space</text>
+    <text x="72" y="795" fill="#68706b" font-size="14">supports systematic discovery across many clinical endpoints</text>
+    <g transform="translate(1069 756)">
+      <rect width="699" height="54" fill="#f8f9f7" stroke="#d9ddda"/>
+      <text x="24" y="33" fill="#315f78" font-size="13" font-weight="700">Discover</text><text x="102" y="33" fill="#68706b" font-size="13">→</text>
+      <text x="129" y="33" fill="#315f78" font-size="13" font-weight="700">reproduce</text><text x="223" y="33" fill="#68706b" font-size="13">→</text>
+      <text x="250" y="33" fill="#315f78" font-size="13" font-weight="700">adjust</text><text x="310" y="33" fill="#68706b" font-size="13">→</text>
+      <text x="337" y="33" fill="#315f78" font-size="13" font-weight="700">compare with coded data</text><text x="516" y="33" fill="#68706b" font-size="13">→</text>
+      <text x="543" y="33" fill="#315f78" font-size="13" font-weight="700">review evidence</text>
+    </g>
+  </svg>
+  </div>
+
+  <div class="legend" aria-label="Modality colors">
+    <span><i class="swatch image"></i>Abdominal CT image</span>
+    <span><i class="swatch report"></i>Radiology report</span>
+    <span><i class="swatch lab"></i>Laboratory</span>
+  </div>
+</main>
+</body>
+</html>

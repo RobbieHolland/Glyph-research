@@ -1,0 +1,4 @@
+numpy>=2,<3
+pandas>=2.2,<4
+pyarrow>=19,<26
+huggingface_hub>=0.34,<3

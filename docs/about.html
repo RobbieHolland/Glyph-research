@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>About Glyph — Clinical Discovery in Stanford Medicine's Abdominal CT Cohort</title>
+  <meta name="description" content="Explore Glyph's interactive clinical concept atlas: 342 concepts from abdominal CT images, radiology reports and laboratory measurements, connected to 141 future disease outcomes.">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="canonical" href="https://robbieholland.github.io/Glyph-research/about.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Glyph · Clinical concept analysis">
+  <meta property="og:description" content="Clinical concepts and disease associations in Stanford Medicine's abdominal CT cohort.">
+  <meta property="og:url" content="https://robbieholland.github.io/Glyph-research/about.html">
+  <meta property="og:image" content="https://robbieholland.github.io/Glyph-research/assets/social-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Glyph · Clinical concept atlas">
+  <meta name="twitter:description" content="Clinical concept analysis of CT, radiology reports and laboratory measurements.">
+  <meta name="twitter:image" content="https://robbieholland.github.io/Glyph-research/assets/social-card.png">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="stylesheet" href="assets/landing.css">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Glyph","url":"https://robbieholland.github.io/Glyph-research/about.html","description":"Interactive clinical concept atlas from Stanford Medicine's abdominal CT cohort.","creator":{"@type":"Person","name":"Robbie Holland","affiliation":{"@type":"Organization","name":"Stanford University"}},"about":["Clinical scientific discovery","Interpretable machine learning","Abdominal computed tomography"]}</script>
+  <link rel="stylesheet" href="assets/timelines.css">
+</head>
+<body>
+  <a class="skip-link" href="index.html#atlas">Skip to the interactive atlas</a>
+  <header class="site-header">
+    <div class="nav-shell">
+      <a class="wordmark" href="./" aria-label="Glyph home"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M6 8l15 3M7 9l5 13M21 12l-8 10"/><circle cx="6" cy="7" r="4" fill="#0066CC"/><circle cx="22" cy="11" r="4" fill="#FE9638"/><circle cx="12" cy="23" r="4" fill="#4A9748"/></svg>Glyph</a>
+      <nav aria-label="Main navigation"><a href="index.html#atlas">Explore</a><a href="index.html#timelines">Timelines</a><a href="about.html" aria-current="page">About</a><a href="https://github.com/RobbieHolland/Glyph" target="_blank" rel="noopener noreferrer">Code <span aria-hidden="true">↗</span></a></nav>
+    </div>
+  </header>
+
+  <main><section class="about-heading page-shell"><h1>About Glyph</h1></section><p class="page-shell" style="font-size:13px;color:#737373">Cohort counts on the main page are reported directly from manuscript v34, Figure 2 and the cohort methods on pages 22–23. Discovery totals include training and validation; testing combines Internal Test and both external sites. <a href="assets/dataset-summary.json">Download the counts</a>.</p>    <section class="study-section page-shell" id="about" aria-labelledby="study-title">
+      <div class="study-intro"><p class="eyebrow">THE STUDY</p><h2 id="study-title">Interpreting multimodal<br>clinical representations.</h2><p>Foundation models learn rich representations of clinical data. Glyph turns those representations into sparse, interpretable concepts—and asks how they relate to future disease.</p><a href="https://github.com/RobbieHolland/Glyph" target="_blank" rel="noopener noreferrer">Code and documentation <span aria-hidden="true">↗</span></a></div>
+      <div class="modality-cards">
+        <article><span class="modality-icon ct-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="3"/><ellipse cx="12" cy="11" rx="5" ry="4"/><path d="M8 18h8M12 7v8"/></svg></span><div><h3>CT imaging</h3><p>Visible morphology, anatomy and findings in abdominal CT volumes.</p></div></article>
+        <article><span class="modality-icon report-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6zM15 3v5h4M9 12h7M9 16h7"/></svg></span><div><h3>Radiology reports</h3><p>Clinical observations documented in the language of radiology.</p></div></article>
+        <article><span class="modality-icon lab-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v7L5 19q-.5 2 2 2h10q2.5 0 2-2l-5-9V3M8 15h8"/></svg></span><div><h3>Laboratory measurements</h3><p>Patterns across biochemical, haematological and related measurements.</p></div></article>
+      </div>
+    </section>
+
+    <section class="notes-section page-shell" aria-label="Study details and citation">
+      <details class="study-details"><summary>About this atlas and its statistics <span aria-hidden="true">+</span></summary><div class="details-copy"><p>The literature timelines on the main page preserve the paper’s frozen HFpEF and sepsis figures. Their clinically adjusted odds ratios are estimated for reconstructed literature markers and Glyph concepts in the study cohort; they are not the effect estimates originally published in the cited studies. References link to the source papers.</p><p>The atlas preserves the original seed-1283 paper layout: <strong>learned concepts and clinical context variables</strong>. Coordinates and connections stay fixed as colors, outcomes and display filters change. Dashed concept outlines retain the original layout's undocumented-concept designation.</p><p>Association estimates are from the Discovery cohort and describe outcomes occurring 1–4 years after CT. Odds ratios are per standard deviation of concept activation. Disease hues identify outcome families, while shade increases linearly with the absolute log odds ratio, scaled separately for each outcome from white at OR 1 to the darkest shade at that outcome’s strongest significant effect under the display filters. Hatched fills indicate lower odds. Disease coloring uses Bonferroni-significant associations; the correction covers all <strong>604,185</strong> tested concept–outcome pairs. Inspect a concept's profile to see nonsignificant estimates too. These are associations, not causal effects.</p><p>The larger study in manuscript v34 reports 397 high-risk concepts and 4,463 Discovery associations; this atlas retains the original saved paper layout. Curated revised interpretations are used where available. Original AutoInterp accuracies, where shown, measure report-based discrimination. They do not validate revised wording or independently establish an imaging biomarker. The five clinical variables have newly computed unadjusted associations with all 141 outcomes, using the same isolated logistic estimator and Discovery population as the concept analysis. Clinical estimates are per standard deviation and use a Bonferroni denominator of 604,890 (the 604,185 original tests plus 705 clinical tests); frozen concept estimates retain their original correction.</p><div class="data-links"><a href="assets/atlas-provenance.json">Data provenance ↗</a><a href="assets/paper-layout.json" download>Paper coordinates ↓</a><a href="assets/atlas-data.json" download>Aggregate atlas data ↓</a></div></div></details>
+      <div class="citation" id="citation"><p class="eyebrow">THE RESEARCH</p><p class="paper-name">Glyph: An Interpretability Engine for AI-Driven Scientific Discovery in Clinical Data</p><p class="authors">Robbie Holland, Ashwin Kumar and colleagues · Stanford University and collaborating institutions</p><p class="citation-note">Public manuscript link forthcoming.</p></div>
+    </section>
+<section id="study-data" class="dataset-section page-shell" aria-labelledby="dataset-title"><h2 id="dataset-title">Study data</h2><div class="dataset-table-wrap"><table class="dataset-table"><thead><tr><th scope="col"><span class="sr-only">Measurement</span></th><th scope="col">Discovery<span>Training + validation</span></th><th scope="col">Test + external sites<span>Internal Test + two external sites</span></th></tr></thead><tbody><tr><th scope="row">Patients</th><td>14,652</td><td>26,976</td></tr><tr><th scope="row">CT volumes / radiology reports</th><td>20,391</td><td>45,139</td></tr><tr><th scope="row">Preprocessed CT slices</th><td>3,262,560</td><td>7,222,240</td></tr><tr><th scope="row">Radiology report tokens</th><td>8,083,882</td><td>14,342,345</td></tr><tr><th scope="row">Laboratory measurements</th><td>1,588,003</td><td>2,184,424</td></tr></tbody></table></div><p class="diagnosis-vocabulary"><strong>16,553</strong> distinct ICD-9/10 codes mapped to <strong>1,692</strong> phenotype categories · <strong>141</strong> prognostic outcomes · <strong>350</strong> lab types</p><p class="dataset-source">Cohort totals reported in manuscript v34. <a href="about.html">Study details</a> · <a href="assets/dataset-summary.json">Counts</a></p></section></main>  <footer class="site-footer page-shell"><a class="footer-brand" href="./">Glyph<span>.</span></a><p>Stanford Medicine · Abdominal CT cohort</p><div><a href="https://github.com/RobbieHolland/Glyph-research" target="_blank" rel="noopener noreferrer">Research repository ↗</a><a href="evidence/">Earlier evidence reviews ↗</a><a href="https://github.com/RobbieHolland/Glyph" target="_blank" rel="noopener noreferrer">Glyph software ↗</a></div></footer>
+</body>
+</html>

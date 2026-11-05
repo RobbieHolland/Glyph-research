@@ -1,0 +1,210 @@
+{
+  "hfpef": {
+    "albumin_lower": {
+      "summary": "Continuous inverse serum albumin: score = −serum albumin.",
+      "encoding": "albumin_lower = -c.albumin",
+      "source_note": "Lam et al. prospectively tested continuous serum albumin among noncardiac measures and repeated models for HFpEF. Albumin was null for overall HF and not retained as a HFpEF predictor; include this prior investigated null comparator. Local acute-care CT cohort has substantially lower albumin than the ambulatory source. No false claim of a positive published HFpEF albumin effect.",
+      "source_sha256": "ca0e47381f15f3b28c4de145fc818019941ec719fe83783b44c9973952242f62"
+    },
+    "diabetes": {
+      "summary": "Pre-CT diagnosis history matching Phecode 250, including descendants.",
+      "encoding": "diabetes = hist('250')\n\ndef hist(code):\n    cols = [k for k in p if k == 'P_' + code or k.startswith('P_' + code + '.')]\n    if not cols:\n        raise ValueError('No supported history ' + code)\n    return p[cols].max(axis=1).to_numpy(float)",
+      "source_note": "Pre-CT diabetes Phecode history proxies source diabetes ascertainment. Ho et al. reported incident HFpEF (EF>45%), not just overall HF. Local first-coded HFpEF is not adjudicated EF.",
+      "source_sha256": "ca0e47381f15f3b28c4de145fc818019941ec719fe83783b44c9973952242f62"
+    },
+    "anemia_lt11": {
+      "summary": "Hemoglobin < 11 g/dL is encoded as 1; otherwise 0. Unavailable measurements remain missing.",
+      "encoding": "anemia_lt11 = indicator(c.hemoglobin.to_numpy(), 11)\n\ndef indicator(v, threshold):\n    return np.where(np.isfinite(v), (v < threshold).astype(float), np.nan)",
+      "source_note": "Exact source anemia threshold hemoglobin <11 g/dL, verified in Table1; NOT the generic WHO threshold. Measured most recent pre-CT hemoglobin. Source population postmenopausal women; local cohort broader.",
+      "source_sha256": "ca0e47381f15f3b28c4de145fc818019941ec719fe83783b44c9973952242f62"
+    },
+    "hypertension": {
+      "summary": "Pre-CT diagnosis history matching Phecode 401.1, including descendants.",
+      "encoding": "hypertension = hist('401.1')\n\ndef hist(code):\n    cols = [k for k in p if k == 'P_' + code or k.startswith('P_' + code + '.')]\n    if not cols:\n        raise ValueError('No supported history ' + code)\n    return p[cols].max(axis=1).to_numpy(float)",
+      "source_note": "Strictly pre-CT essential-hypertension history proxies source measured BP >=140/90 or antihypertensive treatment. Source cohort was postmenopausal women; local cohort includes both sexes and younger adults.",
+      "source_sha256": "ca0e47381f15f3b28c4de145fc818019941ec719fe83783b44c9973952242f62"
+    },
+    "ddimer_log": {
+      "summary": "Natural logarithm of D-dimer (FEU); finite values below 1 are floored at that value.",
+      "encoding": "ddimer_log = log_value('ddimer_feu', 1)\n\ndef log_value(key, floor=None):\n    v = c.get(key, pd.Series(np.nan, index=c.index)).to_numpy(float)\n    if floor is None:\n        v = np.where(v > 0, v, np.nan)\n    else:\n        v = np.where(np.isfinite(v), np.maximum(v, floor), np.nan)\n    return np.log(v)",
+      "source_note": "Source natural-log D-dimer was not associated with HFpEF after full adjustment. Use only explicitly FEU assays, harmonized to ng/mL; nonpositive exact values floor at1 ng/mL before log. Different clinical assay calibration from research measurements.",
+      "source_sha256": "ca0e47381f15f3b28c4de145fc818019941ec719fe83783b44c9973952242f62"
+    },
+    "crp_log_proxy": {
+      "summary": "Natural logarithm of routine CRP; nonpositive measurements remain missing.",
+      "encoding": "crp_log_proxy = log_value('crp_raw')\n\ndef log_value(key, floor=None):\n    v = c.get(key, pd.Series(np.nan, index=c.index)).to_numpy(float)\n    if floor is None:\n        v = np.where(v > 0, v, np.nan)\n    else:\n        v = np.where(np.isfinite(v), np.maximum(v, floor), np.nan)\n    return np.log(v)",
+      "source_note": "Natural-log routine CRP mg/L proxies source hsCRP. Original HFpEF fully adjusted association was null under the source multiplicity threshold. Routine CRP and hsCRP differ in sensitivity and population indication.",
+      "source_sha256": "ca0e47381f15f3b28c4de145fc818019941ec719fe83783b44c9973952242f62"
+    },
+    "tg_hdl_log": {
+      "summary": "Natural logarithm of the measured triglyceride-to-HDL ratio.",
+      "encoding": "ratio = c.triglycerides.to_numpy() / c.hdl.to_numpy()\nratio = np.where(ratio > 0, np.log(ratio), np.nan)\ntg_hdl_log = ratio",
+      "source_note": "Source Table2 used log-transformed triglyceride/HDL ratio and found no significant HFpEF association. Local fasting status is unverified and the two most recent assays need not be from the same draw; proxy retained irrespective of local significance.",
+      "source_sha256": "ca0e47381f15f3b28c4de145fc818019941ec719fe83783b44c9973952242f62"
+    },
+    "ntprobnp_log": {
+      "summary": "Natural logarithm of NT-proBNP; nonpositive measurements remain missing.",
+      "encoding": "ntprobnp_log = log_value('ntprobnp')\n\ndef log_value(key, floor=None):\n    v = c.get(key, pd.Series(np.nan, index=c.index)).to_numpy(float)\n    if floor is None:\n        v = np.where(v > 0, v, np.nan)\n    else:\n        v = np.where(np.isfinite(v), np.maximum(v, floor), np.nan)\n    return np.log(v)",
+      "source_note": "de Boer et al. used natural-log natriuretic peptides, pooled after cohort standardization (NT-proBNP in three cohorts, BNP in FHS). Use dated pre-CT NT-proBNP pg/mL; only ~4% of Train measured. No substitution of post-CT assays.",
+      "source_sha256": "ca0e47381f15f3b28c4de145fc818019941ec719fe83783b44c9973952242f62"
+    },
+    "fibrinogen_log": {
+      "summary": "Natural logarithm of fibrinogen; nonpositive measurements remain missing.",
+      "encoding": "fibrinogen_log = log_value('fibrinogen')\n\ndef log_value(key, floor=None):\n    v = c.get(key, pd.Series(np.nan, index=c.index)).to_numpy(float)\n    if floor is None:\n        v = np.where(v > 0, v, np.nan)\n    else:\n        v = np.where(np.isfinite(v), np.maximum(v, floor), np.nan)\n    return np.log(v)",
+      "source_note": "Natural-log fibrinogen follows the source transformation. The source HFpEF association was suggestive, not significant at the paper Bonferroni threshold; local standard clinical fibrinogen, sparsely measured.",
+      "source_sha256": "ca0e47381f15f3b28c4de145fc818019941ec719fe83783b44c9973952242f62"
+    },
+    "wbc": {
+      "summary": "Continuous white blood-cell count.",
+      "encoding": "wbc = c.wbc",
+      "source_note": "Campbell et al. prospectively evaluated continuous WCC (10^9/L); HFpEF association was univariate, not retained in the final multivariable model. Local adjusted association tests the same measured cell-count direction with common demographic adjustment.",
+      "source_sha256": "ca0e47381f15f3b28c4de145fc818019941ec719fe83783b44c9973952242f62"
+    },
+    "troponin_i_log_proxy": {
+      "summary": "Natural logarithm of conventional troponin I; finite values below 0.001 are floored at that value.",
+      "encoding": "troponin_i_log_proxy = log_value('troponin_i', 0.001)\n\ndef log_value(key, floor=None):\n    v = c.get(key, pd.Series(np.nan, index=c.index)).to_numpy(float)\n    if floor is None:\n        v = np.where(v > 0, v, np.nan)\n    else:\n        v = np.where(np.isfinite(v), np.maximum(v, floor), np.nan)\n    return np.log(v)",
+      "source_note": "Conventional troponin I ng/mL is an assay proxy for source high-sensitivity TnI/TnT, not an exact reproduction. Exact zeros floor at0.001 ng/mL before natural log; no threshold is borrowed across assays. Only six Tri-Valley accessions measured. The sensitivity analysis removes assay proxies.",
+      "source_sha256": "ca0e47381f15f3b28c4de145fc818019941ec719fe83783b44c9973952242f62"
+    },
+    "glucose_proxy": {
+      "summary": "Continuous measured glucose.",
+      "encoding": "glucose_proxy = c.glucose",
+      "source_note": "Source modeled fasting glucose continuously. Local most recent measured pre-CT glucose has no verified fasting status; a nonfasting-assay proxy, not exact replication.",
+      "source_sha256": "ca0e47381f15f3b28c4de145fc818019941ec719fe83783b44c9973952242f62"
+    },
+    "bmi_index": {
+      "summary": "Continuous BMI.",
+      "encoding": "bmi_index = c.bmi",
+      "source_note": "Ho et al. pooled four community cohorts and modeled BMI continuously per SD for incident HFpEF. Local BMI comes from source Recent BMI; its individual measurement date is unavailable. Do not claim that high BMI must be novel.",
+      "source_sha256": "ca0e47381f15f3b28c4de145fc818019941ec719fe83783b44c9973952242f62"
+    },
+    "steatosis": {
+      "summary": "Binary indicator from an affirmative, negation-aware index-CT report mention of steatosis.",
+      "encoding": "steatosis = c.steatosis",
+      "source_note": "Paper defined NAFLD using inpatient/outpatient ICD claims and predicted incident HFpEF. Affirmative negation-aware index-CT report steatosis is an imaging/report proxy; alcohol-related/other etiologies and source claim frequency cannot be reproduced. No Glyph activation is used in this rule.",
+      "source_sha256": "ca0e47381f15f3b28c4de145fc818019941ec719fe83783b44c9973952242f62"
+    },
+    "hba1c": {
+      "summary": "Continuous HbA1c (%).",
+      "encoding": "hba1c = c.hba1c",
+      "source_note": "Jia et al. used continuous measured HbA1c in JHS and reported incident HFpEF specifically. Same percent unit locally; mixed CT indications and diabetes status differ from community recruitment.",
+      "source_sha256": "ca0e47381f15f3b28c4de145fc818019941ec719fe83783b44c9973952242f62"
+    },
+    "smoking_index": {
+      "summary": "Smoking-category risk index using the fixed published category weights listed below.",
+      "encoding": "smoke = c['Smoking Hx'].fillna('').str.extract('^\\\\s*(\\\\d+)', expand=False)\nscore = np.select([smoke.isin(['1', '2']), smoke.eq('4'), smoke.eq('5')], [np.log(2.28), np.log(1.31), 0.0], default=np.nan)\nsmoking_index = score",
+      "source_note": "All three source smoking categories: current/former/never weighted by fixed log HFpEF HRs2.28/1.31/1, verified in Table2. No category excluded or single coefficient cherry-picked. Local history is source baseline metadata; measurement dates unavailable.",
+      "source_sha256": "ca0e47381f15f3b28c4de145fc818019941ec719fe83783b44c9973952242f62"
+    },
+    "ferritin_lower_log": {
+      "summary": "Negative natural logarithm: score = −ln(ferritin); nonpositive measurements are unavailable.",
+      "encoding": "ferritin_lower_log = -log_value('ferritin')\n\ndef log_value(key, floor=None):\n    v = c.get(key, pd.Series(np.nan, index=c.index)).to_numpy(float)\n    if floor is None:\n        v = np.where(v > 0, v, np.nan)\n    else:\n        v = np.where(np.isfinite(v), np.maximum(v, floor), np.nan)\n    return np.log(v)",
+      "source_note": "Paper used inverse log2 ferritin measured by a SomaScan aptamer in adults without baseline anemia. Clinical ferritin ng/mL is an assay proxy; local cohort retains anemia per the agreed common risk set. Inverse natural log has identical per-SD values to inverse log2.",
+      "source_sha256": "ca0e47381f15f3b28c4de145fc818019941ec719fe83783b44c9973952242f62"
+    },
+    "hdl_lower": {
+      "summary": "Continuous inverse HDL cholesterol: score = −HDL cholesterol.",
+      "encoding": "hdl_lower = -c.hdl",
+      "source_note": "Source multicohort study evaluated HDL-C as well as NMR particle metrics; HDL-C was null after adjustment. Clinical HDL-C is available; HDL particle size/concentration are not. Include the null HDL-C comparator, not a substitute claim about particles.",
+      "source_sha256": "ca0e47381f15f3b28c4de145fc818019941ec719fe83783b44c9973952242f62"
+    },
+    "egfr_index": {
+      "summary": "eGFR-category risk index using the published equation, categories and fixed weights listed below.",
+      "encoding": "female = c.Gender.eq('Female').to_numpy()\nknown = c.Gender.isin(['Female', 'Male']).to_numpy()\nscr = c.creatinine.to_numpy()\nage = c.age.to_numpy()\nk = np.where(female, 0.7, 0.9)\nalpha = np.where(female, -0.241, -0.302)\negfr = 142 * np.minimum(scr / k, 1) ** alpha * np.maximum(scr / k, 1) ** (-1.2) * 0.9938 ** age * np.where(female, 1.012, 1)\negfr[~known | ~np.isfinite(age) | (age < 18)] = np.nan\nrenal = np.select([egfr < 45, egfr < 60, egfr < 90], [np.log(2.8), np.log(1.51), np.log(1.07)], default=0.0)\negfr_index = np.where(np.isfinite(egfr), renal, np.nan)",
+      "source_note": "CKD-EPI2021 race-free creatinine equation; all four source categories <45/45–59/60–89/>=90 weighted by fixed HFpEF log HRs2.80/1.51/1.07/1 from Table3. Source postmenopausal women; local both sexes. No middle eGFR category is discarded.",
+      "source_sha256": "ca0e47381f15f3b28c4de145fc818019941ec719fe83783b44c9973952242f62"
+    },
+    "egdr_lower_proxy": {
+      "summary": "Negative estimated glucose-disposal rate: −(19.02 − 0.22×BMI − 3.26×prior hypertension − 0.61×HbA1c).",
+      "encoding": "egdr = 19.02 - 0.22 * c.bmi.to_numpy() - 3.26 * hist('401.1') - 0.61 * c.hba1c.to_numpy()\negdr_lower_proxy = -egdr\n\ndef hist(code):\n    cols = [k for k in p if k == 'P_' + code or k.startswith('P_' + code + '.')]\n    if not cols:\n        raise ValueError('No supported history ' + code)\n    return p[cols].max(axis=1).to_numpy(float)",
+      "source_note": "Published formula eGDR=19.02−0.22*BMI−3.26*hypertension−0.61*HbA1c(%), independently verified in Methods. Local pre-CT hypertension code proxies the source BP>=130/80 or medication definition; no local outcome-fitted formula weights. Retain only cases with BMI/HbA1c, then common Train mean + missing flag for uncovered accessions.",
+      "source_sha256": "ca0e47381f15f3b28c4de145fc818019941ec719fe83783b44c9973952242f62"
+    }
+  },
+  "sepsis": {
+    "albumin_lower": {
+      "summary": "Continuous inverse serum albumin: score = −serum albumin.",
+      "encoding": "albumin_lower = -c.albumin",
+      "source_note": "Original abstract establishes low albumin and subsequent septicemia in hemodialysis; continuous inverse albumin direction test locally. Original category threshold not primary-text verified, so do not label this as an exact threshold reproduction.",
+      "source_sha256": "655b626367f7b114d2a3c36c294987bce7a48c18c8a6c22074dec54376b807aa"
+    },
+    "celiac": {
+      "summary": "Pre-CT diagnosis history matching Phecode 557.1, including descendants.",
+      "encoding": "celiac = hist('557.1')\n\ndef hist(*codes):\n    cols = [k for k in p if any((k == 'P_' + code or k.startswith('P_' + code + '.') for code in codes))]\n    if not cols:\n        raise ValueError('No supported diagnosis history ' + str(codes))\n    return p[cols].max(axis=1).to_numpy(float)",
+      "source_note": "Strictly pre-CT diagnosis flag, corresponding to registry ascertainment; source adult diagnosis timing and local Phecode label differ.",
+      "source_sha256": "655b626367f7b114d2a3c36c294987bce7a48c18c8a6c22074dec54376b807aa"
+    },
+    "smoking_index": {
+      "summary": "Smoking-category risk index using the fixed published category weights listed below.",
+      "encoding": "smoke = c['Smoking Hx'].fillna('').str.extract('^\\\\s*(\\\\d+)', expand=False)\nsmoking = np.select([smoke.isin(['1', '2']), smoke.eq('4'), smoke.eq('5')], [np.log(1.85), np.log(1.64), 0.0], default=np.nan)\nsmoking_index = smoking",
+      "source_note": "Current / past / never, using Table2 published HR1.85/1.64/1 as a fixed score. Baseline Smoking Hx comes from source cohort metadata; individual measurement dates are not in this table.",
+      "source_sha256": "655b626367f7b114d2a3c36c294987bce7a48c18c8a6c22074dec54376b807aa"
+    },
+    "diabetes": {
+      "summary": "Pre-CT diagnosis history matching Phecode 250.0, 250.1, 250.2, including descendants.",
+      "encoding": "diabetes = hist('250.0', '250.1', '250.2')\n\ndef hist(*codes):\n    cols = [k for k in p if any((k == 'P_' + code or k.startswith('P_' + code + '.') for code in codes))]\n    if not cols:\n        raise ValueError('No supported diagnosis history ' + str(codes))\n    return p[cols].max(axis=1).to_numpy(float)",
+      "source_note": "Diagnostic-history proxy; source used glucose thresholds or diabetes medication. No follow-up glucose or diagnosis enters this predictor.",
+      "source_sha256": "655b626367f7b114d2a3c36c294987bce7a48c18c8a6c22074dec54376b807aa"
+    },
+    "hypertension": {
+      "summary": "Pre-CT diagnosis history matching Phecode 401.1, including descendants.",
+      "encoding": "hypertension = hist('401.1')\n\ndef hist(*codes):\n    cols = [k for k in p if any((k == 'P_' + code or k.startswith('P_' + code + '.') for code in codes))]\n    if not cols:\n        raise ValueError('No supported diagnosis history ' + str(codes))\n    return p[cols].max(axis=1).to_numpy(float)",
+      "source_note": "Pre-CT essential-hypertension code proxy; source used measured BP or medication, not this diagnosis flag.",
+      "source_sha256": "655b626367f7b114d2a3c36c294987bce7a48c18c8a6c22074dec54376b807aa"
+    },
+    "bmi_index": {
+      "summary": "BMI-category risk index using all published categories and fixed weights listed below.",
+      "encoding": "bmi = c.bmi.to_numpy()\nbmiindex = np.select([bmi < 18.5, bmi < 25, bmi < 30, bmi < 40], [1.5, 1.0, 1.01, 1.1], default=1.57)\nbmi_index = np.where(np.isfinite(bmi), np.log(bmiindex), np.nan)",
+      "source_note": "All five original BMI categories, fixed fully adjusted separate-BMI model HR1.50/1/1.01/1.10/1.57, main table; no selection of just underweight or obesity coefficients. Baseline BMI is source Recent BMI; measurement date not in survival table.",
+      "source_sha256": "655b626367f7b114d2a3c36c294987bce7a48c18c8a6c22074dec54376b807aa"
+    },
+    "splenectomy": {
+      "summary": "Binary indicator from an affirmative, negation-aware index-CT report mention of splenectomy.",
+      "encoding": "splenectomy = c.splenectomy",
+      "source_note": "Affirmative index-CT report mention; does not reproduce registry indication, vaccination or procedure dates.",
+      "source_sha256": "655b626367f7b114d2a3c36c294987bce7a48c18c8a6c22074dec54376b807aa"
+    },
+    "egfr_index": {
+      "summary": "eGFR-category risk index using the published equation, categories and fixed weights listed below.",
+      "encoding": "female = c.Gender.eq('Female').to_numpy()\nsexknown = c.Gender.isin(['Male', 'Female']).to_numpy()\nblack = c.Race.fillna('').str.contains('black|african american', case=False).to_numpy()\nscr = c.creatinine.to_numpy()\nage = c.age.to_numpy()\nk = np.where(female, 0.7, 0.9)\nalpha = np.where(female, -0.329, -0.411)\negfr = 141 * np.minimum(scr / k, 1) ** alpha * np.maximum(scr / k, 1) ** (-1.209) * 0.993 ** age * np.where(female, 1.018, 1) * np.where(black, 1.159, 1)\negfr[~sexknown | ~np.isfinite(age) | (age < 18)] = np.nan\nrenal = np.select([egfr < 15, egfr < 30, egfr < 45, egfr < 60], [5.56, 2.5, 1.51, 1.11], default=1.0)\nrenal = np.where(np.isfinite(egfr), np.log(renal), np.nan)\negfr_index = renal",
+      "source_note": "Five CKD-EPI 2009 categories <15,15–29,30–44,45–59,>=60; fixed log sepsis IRRs 5.56,2.50,1.51,1.11,1 from Table3. CKD-EPI equation uses historical sex/race coefficients. No 0.95 creatinine correction because these local assays are not the historical unstandardized UK assays. Broader cohort than original older diabetes cohort.",
+      "source_sha256": "655b626367f7b114d2a3c36c294987bce7a48c18c8a6c22074dec54376b807aa"
+    },
+    "ldl_lower": {
+      "summary": "Continuous inverse LDL cholesterol: score = −LDL cholesterol.",
+      "encoding": "ldl_lower = -c.ldl",
+      "source_note": "Continuous inverse measured LDL, matching the reported continuous per-SD analysis in Table2; source quartile contrasts also available but not duplicate model features.",
+      "source_sha256": "655b626367f7b114d2a3c36c294987bce7a48c18c8a6c22074dec54376b807aa"
+    },
+    "hdl_lower": {
+      "summary": "Continuous inverse HDL cholesterol: score = −HDL cholesterol.",
+      "encoding": "hdl_lower = -c.hdl",
+      "source_note": "Continuous inverse HDL from the same source, whose fully adjusted prospective HDL finding was null; retained irrespective of local significance. This is a null literature comparator.",
+      "source_sha256": "655b626367f7b114d2a3c36c294987bce7a48c18c8a6c22074dec54376b807aa"
+    },
+    "lymphopenia": {
+      "summary": "1 for lymphocytes <1.1 ×10⁹/L; 0 for 1.1–3.7 ×10⁹/L. Values above 3.7 and unavailable measurements remain missing.",
+      "encoding": "lymph = c.lymphocyte_abs.to_numpy()\nlow = np.where(lymph < 1.1, 1.0, 0.0)\nlow[~np.isfinite(lymph) | (lymph > 3.7)] = np.nan\nlymphopenia = low",
+      "source_note": "Absolute lymphocytes <1.1 versus1.1–3.7 x10^9/L. >3.7 is outside the cited contrast and gets neutral Train imputation plus coverage indicator, with no accession excluded.",
+      "source_sha256": "655b626367f7b114d2a3c36c294987bce7a48c18c8a6c22074dec54376b807aa"
+    },
+    "hcv_history": {
+      "summary": "Pre-CT diagnosis history matching Phecode 70.3, including descendants.",
+      "encoding": "hcv_history = hist('70.3')\n\ndef hist(*codes):\n    cols = [k for k in p if any((k == 'P_' + code or k.startswith('P_' + code + '.') for code in codes))]\n    if not cols:\n        raise ValueError('No supported diagnosis history ' + str(codes))\n    return p[cols].max(axis=1).to_numpy(float)",
+      "source_note": "Pre-CT diagnosis proxy for serology-defined noncirrhotic HCV in the source. Does not assert that a diagnosis equals viral load or that the broad CT cohort is noncirrhotic.",
+      "source_sha256": "655b626367f7b114d2a3c36c294987bce7a48c18c8a6c22074dec54376b807aa"
+    },
+    "hba1c_index": {
+      "summary": "HbA1c-category risk index using all seven published IFCC categories and fixed weights, restricted to prior type 2 diabetes.",
+      "encoding": "hba = c.hba1c.to_numpy()\nifcc = np.rint((hba - 2.15) * 10.929)\nhrs = np.select([ifcc < 43, ifcc < 48, ifcc < 53, ifcc < 63, ifcc < 73, ifcc < 83], [1.15, 1.0, 1.0, 0.93, 1.05, 1.14], default=1.52)\ndiabetes = hist('250.2')\nscore = np.where(np.isfinite(hba) & (diabetes > 0), np.log(hrs), np.nan)\nhba1c_index = score\n\ndef hist(*codes):\n    cols = [k for k in p if any((k == 'P_' + code or k.startswith('P_' + code + '.') for code in codes))]\n    if not cols:\n        raise ValueError('No supported diagnosis history ' + str(codes))\n    return p[cols].max(axis=1).to_numpy(float)",
+      "source_note": "All seven IFCC categories <43,43–47,48–52,53–62,63–72,73–82,>82 mmol/mol: fixed published HR1.15/1/1/.93/1.05/1.14/1.52. Single latest pre-CT HbA1c, not source time-updated mean. Non-T2D or unmeasured accessions receive neutral Train imputation plus coverage flag.",
+      "source_sha256": "655b626367f7b114d2a3c36c294987bce7a48c18c8a6c22074dec54376b807aa"
+    },
+    "steatosis": {
+      "summary": "Binary indicator from an affirmative, negation-aware index-CT report mention of steatosis.",
+      "encoding": "steatosis = c.steatosis",
+      "source_note": "Affirmative CT-report steatosis is a proxy for biopsy-proven NAFLD, with secondary sepsis outcome in the source. Alcohol-related disease and histology cannot be resolved by this rule.",
+      "source_sha256": "655b626367f7b114d2a3c36c294987bce7a48c18c8a6c22074dec54376b807aa"
+    }
+  }
+}
