@@ -129,7 +129,8 @@ def check():
             assert frame.evaluate('() => DATA.nodes.map(n=>[n.concept_id,n.x,n.y])')==before
             assert page.locator('.research-word').count()==0
             assert page.locator('.hero-description').count()==0
-            assert page.locator('.hero-tagline').inner_text()=='Exploring clinical concepts in multimodal data.'
+            assert page.locator('.hero-tagline').inner_text()=='Exploring clinical concepts in multimodal data at Stanford Medicine'
+            assert page.locator('.hero-kicker').count()==0
             checks.append('Fourteen rounded neighborhoods toggle without moving nodes; permanent Patient age annotation')
             page.locator('#atlas-search').fill('azotemia')
             azotemia=page.locator('#atlas-search-results button').filter(has_text='L84')
